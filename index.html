@@ -57,15 +57,6 @@
       100% { transform: scale(1); }
     }
 
-    @keyframes gachaShake {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      20% { transform: translate(-6px, 4px) rotate(-6deg); }
-      40% { transform: translate(6px, -4px) rotate(6deg); }
-      60% { transform: translate(-6px, -2px) rotate(-4deg); }
-      80% { transform: translate(6px, 2px) rotate(4deg); }
-      100% { transform: translate(0, 0) rotate(0deg); }
-    }
-
     @keyframes floatUpFade {
       0% { transform: translateY(0) scale(1); opacity: 1; }
       100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
@@ -457,7 +448,6 @@
     const RARITY = { C: 'Common', R: 'Rare', SSR: 'SSR', UR: 'UR' };
     const DEMAND = { INELASTIC: 'Inelastic (Iron Rod)', ELASTIC: 'Elastic (Rubber Band)' };
     
-    // Generates 15 items per theme (6 themes = 90 items total)
     const PRODUCTS_CATALOG = [
       // --- PASTEL DREAM ---
       { id: 'p1', theme: 'pastel', name: 'Pastel Sticky Notes', rarity: RARITY.C, emoji: '📝', elasticity: DEMAND.INELASTIC, unitCost: 5, basePrice: 10, lore: 'Basic student need. Very inelastic.' },
@@ -599,7 +589,6 @@
       if (saved) {
         try {
           gameState = { ...gameState, ...JSON.parse(saved) };
-          // Sync equipped array length if upgraded
           while (gameState.equippedProducts.length < gameState.maxSlots) {
             gameState.equippedProducts.push(null);
           }
@@ -691,7 +680,6 @@
       document.getElementById('hudHype').innerText = `${buffs.hype.toFixed(2)}x`;
       document.getElementById('hudSpeed').innerText = `+${Math.round(buffs.speed * 100)}%`;
 
-      // Update Visual Header
       const headerLayer = document.getElementById('decorItemsLayer');
       if (headerLayer) {
         headerLayer.innerHTML = '';
@@ -775,7 +763,7 @@
     }
 
     /* ==========================================================================
-       4. SHELVES & 4P MARKETING ENGINE
+       4. REFINED 4P MARKETING EVALUATION ENGINE
        ========================================================================== */
     function initStrategy(prodId) {
       if (!gameState.activeStrategies[prodId]) {
@@ -789,56 +777,98 @@
     }
 
     function evaluateStrategy(product, strat) {
-      let stars = 5;
-      let feedback = "Excellent 4P Strategy Alignment!";
+      let score = 100; // Point system evaluated from 0 - 100
+      let feedbackList = [];
       let multiplier = 1.0;
 
       const isElastic = product.elasticity.includes('Elastic');
+      const isHighRarity = product.rarity === 'SSR' || product.rarity === 'UR';
+      const isCommon = product.rarity === 'Common';
       const priceRatio = strat.priceRatio || 1.0;
 
-      // Price & Demand Elasticity evaluation
-      if (isElastic && priceRatio > 1.3) {
-        stars -= 1;
-        feedback = `${product.name} is Elastic! High prices reduce volume.`;
-        multiplier *= 0.6;
-      } else if (!isElastic && priceRatio > 1.6) {
-        if (priceRatio > 2.2) {
-          stars -= 1;
-          feedback = `Overpricing even inelastic goods turns away buyers.`;
-          multiplier *= 0.75;
-        } else {
-          multiplier *= 1.15;
+      // --- 1. PRICE EVALUATION ---
+      if (isElastic) {
+        if (priceRatio > 1.25) {
+          const penalty = Math.min(35, Math.round((priceRatio - 1.25) * 45));
+          score -= penalty;
+          feedbackList.push(`${product.name} is Elastic! High price (${Math.round(priceRatio * 100)}%) drastically reduces volume.`);
+          multiplier *= Math.max(0.3, 1.0 - (priceRatio - 1.25) * 0.8);
+        } else if (priceRatio < 0.8) {
+          score -= 15;
+          feedbackList.push(`Underpricing elastic goods cuts unnecessarily into gross margins.`);
+          multiplier *= 0.9;
+        } else if (priceRatio >= 0.9 && priceRatio <= 1.1) {
+          multiplier *= 1.1; // Optimal elastic pricing bonus
+        }
+      } else {
+        // Inelastic goods
+        if (priceRatio < 1.0) {
+          score -= 20;
+          feedbackList.push(`${product.name} is Inelastic! Customers are willing to pay above MSRP.`);
+          multiplier *= 0.85;
+        } else if (priceRatio > 2.0) {
+          score -= 30;
+          feedbackList.push(`Price ratio (${Math.round(priceRatio * 100)}%) exceeds buyer tolerance even for inelastic goods.`);
+          multiplier *= 0.7;
+        } else if (priceRatio >= 1.2 && priceRatio <= 1.7) {
+          multiplier *= 1.25; // Inelastic premium margin bonus
         }
       }
 
-      // Place / Distribution Strategy evaluation
-      if ((product.rarity === 'UR' || product.rarity === 'SSR') && strat.place === 'extensive') {
-        stars -= 1;
-        feedback = `Mass distribution dilutes high-rarity prestige!`;
-        multiplier *= 0.8;
-      } else if ((product.rarity === 'UR' || product.rarity === 'SSR') && strat.place === 'exclusive') {
+      // --- 2. PLACE (DISTRIBUTION) EVALUATION ---
+      if (isHighRarity) {
+        if (strat.place === 'extensive') {
+          score -= 25;
+          feedbackList.push(`Mass distribution dilutes prestige for ${product.rarity} items.`);
+          multiplier *= 0.75;
+        } else if (strat.place === 'exclusive') {
+          multiplier *= 1.2;
+        }
+      } else if (isCommon) {
+        if (strat.place === 'exclusive') {
+          score -= 25;
+          feedbackList.push(`Exclusive placement for Common items incurs unnecessary overhead.`);
+          multiplier *= 0.8;
+        } else if (strat.place === 'extensive') {
+          multiplier *= 1.1;
+        }
+      }
+
+      // --- 3. PROMOTION EVALUATION ---
+      if (isHighRarity && strat.promo === 'discount') {
+        score -= 25;
+        feedbackList.push(`Discounting ${product.rarity} luxury goods damages premium perception.`);
+        multiplier *= 0.7;
+      } else if (isHighRarity && (strat.promo === 'vip_pull' || strat.promo === 'persuasive' || strat.promo === 'viral')) {
         multiplier *= 1.25;
-      } else if (product.rarity === 'Common' && strat.place === 'exclusive') {
-        stars -= 1;
-        feedback = `Exclusive placement for Common items wastes funds!`;
+      } else if (isElastic && strat.promo === 'discount') {
+        multiplier *= 1.2;
+      } else if (isCommon && strat.promo === 'vip_pull') {
+        score -= 15;
+        feedbackList.push(`Targeting VIPs for Common items yields low marketing ROI.`);
         multiplier *= 0.85;
       }
 
-      // Promotion Strategy evaluation
-      if (strat.promo === 'discount' && (product.rarity === 'UR' || product.rarity === 'SSR')) {
-        stars -= 1;
-        feedback = `Discounting luxury items hurts brand image!`;
-        multiplier *= 0.7;
-      } else if (strat.promo === 'discount' && isElastic) {
-        multiplier *= 1.3;
-      } else if (strat.promo === 'vip_pull' && (product.rarity === 'UR' || product.rarity === 'SSR')) {
-        multiplier *= 1.3;
-      } else if (strat.promo === 'viral') {
-        multiplier *= 1.35;
+      // --- 4. STRATEGY SYNERGY / MISMATCH ---
+      if (strat.promo === 'discount' && strat.place === 'exclusive') {
+        score -= 20;
+        feedbackList.push(`Contradictory strategy: Exclusive distribution paired with Flash Discount.`);
+        multiplier *= 0.75;
       }
 
-      stars = Math.max(1, Math.min(5, stars));
-      return { stars, feedback, multiplier };
+      // Convert score to 1-5 Stars
+      let stars = 5;
+      if (score < 45) stars = 1;
+      else if (score < 65) stars = 2;
+      else if (score < 80) stars = 3;
+      else if (score < 92) stars = 4;
+      else stars = 5;
+
+      const mainFeedback = feedbackList.length > 0 
+        ? feedbackList[0] 
+        : "Optimal 4P Strategy! Excellent alignment across Price, Place & Promotion.";
+
+      return { stars, score, feedback: mainFeedback, allFeedback: feedbackList, multiplier };
     }
 
     function renderShelves() {
@@ -966,7 +996,6 @@
         grid.appendChild(card);
       }
 
-      // Render Expansion Card if available slots remain
       const nextSlot = gameState.maxSlots + 1;
       if (nextSlot <= 6) {
         const cost = SLOT_UPGRADE_COSTS[nextSlot];
@@ -993,7 +1022,7 @@
        ========================================================================== */
     let rushInterval, spawnInterval;
     let isRushActive = false;
-    let sessionStats = { gross: 0, cost: 0, details: {} };
+    let sessionStats = { gross: 0, cost: 0, details: {}, totalStars: 0, strategyEvaluations: [] };
 
     function startShopRush() {
       const activeItems = gameState.equippedProducts.filter(x => x !== null);
@@ -1002,7 +1031,7 @@
         return;
       }
 
-      playSound('ur'); // Exciting start sound
+      playSound('ur');
       isRushActive = true;
       
       sessionStats = { gross: 0, cost: 0, details: {}, totalStars: 0, strategyEvaluations: [] };
@@ -1018,7 +1047,6 @@
         sessionStats.totalStars += evalResult.stars;
       });
       
-      // Deduct strategy setup costs immediately for the shift
       sessionStats.cost += overheadCost;
       
       document.getElementById('shopRushContainer').classList.remove('hidden');
@@ -1031,16 +1059,14 @@
       let timeLeft = 15;
       document.getElementById('rushTimerBadge').innerText = `${timeLeft}s`;
 
-      // 1-second countdown loop
       rushInterval = setInterval(() => {
         timeLeft--;
         document.getElementById('rushTimerBadge').innerText = `${timeLeft}s`;
         if (timeLeft <= 0) endShopRush();
       }, 1000);
 
-      // Spawner loop based on Decor Buffs
       const buffs = getBuffs();
-      const baseSpawnDelay = 800; // ms
+      const baseSpawnDelay = 800;
       const adjustedDelay = Math.max(300, baseSpawnDelay * (1 - buffs.speed));
 
       const spawner = () => {
@@ -1067,7 +1093,6 @@
       `;
       floor.appendChild(avatarContainer);
 
-      // AI Decision Logic
       const chosenId = activeItems[Math.floor(Math.random() * activeItems.length)];
       const product = PRODUCTS_CATALOG.find(p => p.id === chosenId);
       const strat = gameState.activeStrategies[chosenId];
@@ -1075,42 +1100,31 @@
       
       const evalResult = evaluateStrategy(product, strat);
 
-      // Elasticity curve mapping
-      let buyChance = 0.5; // Base 50%
+      let buyChance = 0.55;
       const ratio = setPrice / product.basePrice;
       
       if (product.elasticity.includes('Elastic')) {
-        // Punish high price heavily
-        buyChance -= (ratio - 1) * 0.8; 
+        buyChance -= (ratio - 1) * 0.85; 
       } else {
-        // Inelastic (Staples/Luxury) - forgives moderate price hikes
         buyChance -= (ratio - 1) * 0.25;
       }
 
-      // REALISM ENGINE: Niche Luxury Demographic Factor
-      // Ultra-expensive items (setPrice > 300) cannot be sold in mass quantities to average shoppers.
       if (setPrice > 300) {
         if (!isVip) {
-          // Average shoppers pass on high-ticket luxury items
           const luxuryDampener = Math.pow(300 / setPrice, 1.3);
           buyChance *= luxuryDampener;
         } else {
-          // VIP shoppers are actively looking for high-ticket items
           buyChance *= 1.6;
         }
       }
       
-      // Global Hype Buff
       buyChance *= buffs.hype;
-      
       buyChance *= evalResult.multiplier;
-      
-      // Cap probabilities (Minimum 2% conversion for mass market high-ticket, max 95%)
       buyChance = Math.max(0.02, Math.min(0.95, buyChance));
       
       const willBuy = Math.random() < buyChance;
       let currentX = -50;
-      const targetX = 100 + Math.random() * 150; // Walk to center to 'decide'
+      const targetX = 100 + Math.random() * 150;
 
       const moveState = setInterval(() => {
         if (!isRushActive) {
@@ -1130,7 +1144,6 @@
             const rev = setPrice * qty;
             const cost = product.unitCost * qty;
             
-            // Record Stats
             sessionStats.gross += rev;
             sessionStats.cost += cost;
             if(!sessionStats.details[product.id]) sessionStats.details[product.id] = { product, qty: 0, rev: 0 };
@@ -1139,22 +1152,18 @@
             
             document.getElementById('liveRevenue').innerText = `🪙 ${Math.round(sessionStats.gross)}`;
             
-            // Visual feedback
             const carrier = avatarContainer.querySelector('.item-carrier');
             carrier.innerText = product.emoji;
             carrier.style.opacity = '1';
             createFlyingCoin(currentX, 100, rev);
 
-            // Change target to checkout counter
             avatarContainer.dataset.targetX = floor.clientWidth - 80;
           } else {
-            // Rejection, walks away
             avatarContainer.querySelector('div').style.filter = 'grayscale(100%) opacity(50%)';
             avatarContainer.dataset.targetX = floor.clientWidth + 50;
           }
         }
 
-        // Walk to exit/checkout
         if (avatarContainer.dataset.decided === "true") {
           const dest = parseFloat(avatarContainer.dataset.targetX);
           if (currentX > dest) {
@@ -1194,12 +1203,10 @@
       document.getElementById('settlementStars').innerText = starIcons;
       document.getElementById('settlementStars').className = `relative z-10 mt-3 text-3xl drop-shadow-md tracking-widest ${avgStars >= 4 ? 'text-amber-400' : avgStars === 3 ? 'text-blue-400' : 'text-rose-400'}`;
       
-      // Grab the first piece of constructive feedback to show the player
-      const feedbackTexts = sessionStats.strategyEvaluations.map(e => e.feedback).filter(f => f && f !== "Excellent 4P Strategy Alignment!");
-      document.getElementById('settlementFeedback').innerText = feedbackTexts[0] || "Excellent 4P Strategy Alignment!";
+      const feedbackTexts = sessionStats.strategyEvaluations.map(e => e.feedback).filter(f => f && f !== "Optimal 4P Strategy! Excellent alignment across Price, Place & Promotion.");
+      document.getElementById('settlementFeedback').innerText = feedbackTexts[0] || "Optimal 4P Strategy! Excellent alignment across Price, Place & Promotion.";
       document.getElementById('settlementFeedback').className = `relative z-10 mt-2 text-[10px] font-bold text-white uppercase bg-white/20 inline-block px-3 py-1 rounded-full backdrop-blur-sm ${avgStars <= 2 ? 'bg-rose-500/80 border border-rose-400' : ''}`;
 
-      // Populate Settlement Modal
       const list = document.getElementById('settlementList');
       list.innerHTML = '';
       
@@ -1228,7 +1235,6 @@
       document.getElementById('settleCost').innerText = `-🪙 ${Math.round(sessionStats.cost)}`;
       document.getElementById('settleNet').innerText = `🪙 ${Math.round(net)}`;
 
-      // Show Modal & Particle Explosion
       const modal = document.getElementById('modalSettlement');
       const card = document.getElementById('settlementCard');
       modal.classList.remove('hidden');
@@ -1269,42 +1275,36 @@
       saveGame();
       playSound('gacha');
 
-      // 1. Filter pool by theme
       const pool = PRODUCTS_CATALOG.filter(p => p.theme === theme);
-      
-      // 2. Determine Rarity (Realistic gacha probability tiers)
       let roll = Math.random();
       let targetRarity = RARITY.C;
       
-      if (cost >= 500) { // Luxury tier machine
-        if (roll < 0.40) targetRarity = RARITY.C;       // 40% Common
-        else if (roll < 0.82) targetRarity = RARITY.R;  // 42% Rare
-        else if (roll < 0.97) targetRarity = RARITY.SSR; // 15% SSR
-        else targetRarity = RARITY.UR;                  // 3% UR
-      } else if (cost >= 250) { // Eco / Streetwear / Cyber
-        if (roll < 0.50) targetRarity = RARITY.C;       // 50% Common
-        else if (roll < 0.85) targetRarity = RARITY.R;  // 35% Rare
-        else if (roll < 0.98) targetRarity = RARITY.SSR; // 13% SSR
-        else targetRarity = RARITY.UR;                  // 2% UR
-      } else { // Pastel / Retro
-        if (roll < 0.60) targetRarity = RARITY.C;       // 60% Common
-        else if (roll < 0.90) targetRarity = RARITY.R;  // 30% Rare
-        else if (roll < 0.99) targetRarity = RARITY.SSR; // 9% SSR
-        else targetRarity = RARITY.UR;                  // 1% UR
+      if (cost >= 500) {
+        if (roll < 0.40) targetRarity = RARITY.C;
+        else if (roll < 0.82) targetRarity = RARITY.R;
+        else if (roll < 0.97) targetRarity = RARITY.SSR;
+        else targetRarity = RARITY.UR;
+      } else if (cost >= 250) {
+        if (roll < 0.50) targetRarity = RARITY.C;
+        else if (roll < 0.85) targetRarity = RARITY.R;
+        else if (roll < 0.98) targetRarity = RARITY.SSR;
+        else targetRarity = RARITY.UR;
+      } else {
+        if (roll < 0.60) targetRarity = RARITY.C;
+        else if (roll < 0.90) targetRarity = RARITY.R;
+        else if (roll < 0.99) targetRarity = RARITY.SSR;
+        else targetRarity = RARITY.UR;
       }
 
-      // 3. Select Item with safety fallback
       let rarityPool = pool.filter(p => p.rarity === targetRarity);
       if (rarityPool.length === 0) rarityPool = pool;
       const pulledItem = rarityPool[Math.floor(Math.random() * rarityPool.length)];
 
-      // 4. Save Unlock
       if (!gameState.gachaUnlocks.includes(pulledItem.id)) {
         gameState.gachaUnlocks.push(pulledItem.id);
         saveGame();
       }
 
-      // 5. Reveal UI
       setTimeout(() => {
         if (pulledItem.rarity === RARITY.UR) playSound('ur');
         else playSound('coin');
@@ -1441,7 +1441,6 @@
     // Initialize
     window.onload = () => {
       loadGame();
-      // Ensure defaults if empty array
       if(gameState.equippedProducts.length === 0) gameState.equippedProducts = [null, null];
     };
   </script>
