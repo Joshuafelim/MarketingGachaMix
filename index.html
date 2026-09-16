@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gacha Market Fever: Deluxe</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            blush: '#FFB6C1',
+            mint: '#BFFCC6',
+            lavender: '#E6E6FA',
+            gold: '#FFD700',
+            cyber: '#00F0FF',
+            street: '#FF4500',
+            pastelBg: '#FFF5F7',
+          },
+          fontFamily: {
+            fredoka: ['Fredoka', 'sans-serif'],
+            quicksand: ['Quicksand', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background-color: #FFF5F7;
+      background-image: radial-gradient(#FFD1DC 1px, transparent 1px), radial-gradient(#E2F0CB 1px, #FFF5F7 1px);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.05); opacity: 1; }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes gachaShake {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      20% { transform: translate(-6px, 4px) rotate(-6deg); }
+      40% { transform: translate(6px, -4px) rotate(6deg); }
+      60% { transform: translate(-6px, -2px) rotate(-4deg); }
+      80% { transform: translate(6px, 2px) rotate(4deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    @keyframes floatUpFade {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
+    }
+
+    @keyframes rainbowShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes walkBob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-4px) rotate(-2deg); }
+      75% { transform: translateY(-4px) rotate(2deg); }
+    }
+
+    @keyframes coinExplosion {
+      0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(1.2); opacity: 0; }
+    }
+
+    .ur-glow {
+      background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: rainbowShift 2s linear infinite;
+      font-weight: 900;
+    }
+    
+    .ur-border {
+      border: 3px solid transparent;
+      background-image: linear-gradient(white, white), linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      animation: rainbowShift 2s linear infinite;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-pastel {
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 0 rgba(0,0,0,0.12);
+    }
+    .btn-pastel:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 rgba(0,0,0,0.12);
+    }
+    .btn-pastel:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.12);
+    }
+    .btn-pastel:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(100%);
+    }
+
+    .slider-thumb::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: currentColor;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-700 flex flex-col justify-between overflow-x-hidden">
+
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b-2 border-slate-100 shadow-sm px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+      
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl shadow-lg transform hover:rotate-12 transition-transform">
+          💎
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent tracking-tight">
+            Gacha Market <span class="ur-glow">DELUXE</span>
+          </h1>
+          <p class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest">Product. Price. Place. Promotion.</p>
+        </div>
+      </div>
+
+      <!-- Live Player Stats HUD -->
+      <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shadow-inner">
+          <span class="text-lg text-amber-500"><i class="fa-solid fa-coins"></i></span>
+          <span id="hudCoins" class="font-black text-slate-800 text-lg font-outfit">1,000</span>
+        </div>
+        <div class="flex items-center gap-2 bg-pink-50 border border-pink-200 px-3 py-1.5 rounded-xl shadow-inner" title="Hype Multiplier (Increases overall demand)">
+          <span class="text-lg text-pink-500"><i class="fa-solid fa-fire"></i></span>
+          <span id="hudHype" class="font-bold text-pink-700 text-sm">1.0x</span>
+        </div>
+        <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl shadow-inner" title="Sales Speed Buff (Faster customer spawns)">
+          <span class="text-lg text-emerald-500"><i class="fa-solid fa-bolt"></i></span>
+          <span id="hudSpeed" class="font-bold text-emerald-700 text-sm">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="max-w-7xl mx-auto mt-4 flex justify-start md:justify-center gap-2 overflow-x-auto pb-1 px-2 no-scrollbar">
+      <button onclick="switchTab('shop')" id="tabBtn-shop" class="nav-tab px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 bg-slate-800 text-white shadow-md whitespace-nowrap">
+        <i class="fa-solid fa-store"></i> My Boutique
+      </button>
+      <button onclick="switchTab('gacha')" id="tabBtn-gacha" class="nav-tab px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 whitespace-nowrap">
+        <i class="fa-solid fa-capsules"></i> Gacha Stock
+      </button>
+      <button onclick="switchTab('decor')" id="tabBtn-decor" class="nav-tab px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 whitespace-nowrap">
+        <i class="fa-solid fa-gem"></i> Decor & Buffs
+      </button>
+      <button onclick="switchTab('collection')" id="tabBtn-collection" class="nav-tab px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 whitespace-nowrap">
+        <i class="fa-solid fa-book-open"></i> Vault
+      </button>
+    </nav>
+  </header>
+
+  <main class="max-w-7xl mx-auto w-full p-4 flex-grow">
+
+    <!-- ==========================================
+         VIEW 1: BOUTIQUE SHOP (The Core Gameplay)
+         ========================================== -->
+    <section id="view-shop" class="tab-view space-y-6">
+      
+      <!-- Boutique Visual Header & Decor Display -->
+      <div id="shopHeaderBanner" class="relative glass-card rounded-[2rem] p-6 md:p-10 overflow-hidden border border-slate-200 transition-all duration-500 min-h-[160px] flex items-center justify-between">
+        
+        <!-- Decor Visual Layers (Dynamically populated) -->
+        <div id="decorVisualLayer" class="absolute inset-0 pointer-events-none opacity-20 bg-cover bg-center transition-all duration-700"></div>
+        <div id="decorItemsLayer" class="absolute inset-0 pointer-events-none flex justify-around items-end pb-4 text-4xl opacity-80"></div>
+
+        <div class="relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="text-center md:text-left">
+            <span class="text-xs font-black uppercase tracking-[0.2em] text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">Live Operation</span>
+            <h2 class="text-3xl md:text-4xl font-black text-slate-800 mt-2">The Grand Retail</h2>
+            <p class="text-sm text-slate-600 mt-1 font-medium max-w-md">Align your 4P Strategy (Product, Price, Place, Promotion) to maximize profit during the 15-second customer rush.</p>
+          </div>
+
+          <button onclick="startShopRush()" id="btnOpenBoutique" class="btn-pastel bg-slate-900 text-white font-black text-xl px-10 py-5 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-xl hover:bg-slate-800 active:scale-95 w-full md:w-auto">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-door-open text-2xl"></i> OPEN SHOP</span>
+            <span class="text-xs text-slate-400 font-normal uppercase tracking-widest">15 Second Rush</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic Store Shelves -->
+      <div>
+        <div class="flex flex-col sm:flex-row items-center justify-between mb-4 gap-2">
+          <h3 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-shelves"></i> Display Management
+          </h3>
+          <div class="bg-blue-50 text-blue-700 text-xs font-bold px-4 py-2 rounded-xl border border-blue-200 flex items-center gap-2">
+            <i class="fa-solid fa-circle-info"></i> Elasticity: Inelastic = Steady | Elastic = Price Sensitive
+          </div>
+        </div>
+
+        <!-- Shelf Grid (Dynamically sized 2 to 6 slots) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="shelvesGrid">
+          <!-- Populated by renderShelves() -->
+        </div>
+      </div>
+
+      <div id="shopRushContainer" class="hidden glass-card rounded-[2rem] p-6 border-2 border-indigo-300 relative overflow-hidden shadow-2xl transition-all">
+        <!-- Rush HUD -->
+        <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
+          <div class="flex items-center gap-4">
+            <div id="rushTimerBadge" class="bg-rose-500 text-white font-black text-2xl px-5 py-2 rounded-xl shadow-inner font-outfit">
+              15s
+            </div>
+            <div>
+              <h4 class="font-black text-slate-800 text-lg uppercase tracking-tight">Rush in Progress!</h4>
+              <p class="text-xs text-slate-500 font-semibold">Customers are evaluating your prices...</p>
+            </div>
+          </div>
+          
+          <div class="text-right hidden sm:block">
+            <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Session Revenue</div>
+            <div id="liveRevenue" class="text-2xl font-black text-emerald-500 font-outfit">🪙 0</div>
+          </div>
+        </div>
+
+        <!-- The Animated Shop Floor -->
+        <div id="shopperFloor" class="relative w-full h-72 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden perspective-1000">
+          <!-- Background styling -->
+          <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 8px);"></div>
+          
+          <!-- Checkout Register Area (Destination) -->
+          <div class="absolute right-0 top-0 bottom-0 w-32 bg-slate-200/50 border-l-2 border-slate-300 flex flex-col items-center justify-center z-10">
+            <div class="text-4xl bg-white p-4 rounded-full shadow-md mb-2">🛒</div>
+            <span class="text-xs font-black text-slate-600 uppercase tracking-widest">Checkout</span>
+          </div>
+
+          <!-- Avatars dynamically spawn here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 2: 4 THEMED GACHA MACHINES
+         ========================================== -->
+    <section id="view-gacha" class="tab-view hidden space-y-8">
+      <div class="text-center max-w-2xl mx-auto space-y-2">
+        <h2 class="text-4xl font-black text-slate-800">Supply Procurement</h2>
+        <p class="text-sm text-slate-600 font-medium">Pull inventory from themed suppliers. Higher cost capsules yield rarer, higher-margin products (Common, Rare, SSR, <span class="ur-glow">UR</span>).</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- 1. Pastel Dream -->
+        <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-pink-400 relative group overflow-hidden">
+          <div class="absolute -right-6 -top-6 w-24 h-24 bg-pink-200 rounded-full blur-2xl opacity-50"></div>
+          <h3 class="text-xl font-black text-slate-800 mb-1">Pastel Dream</h3>
+          <p class="text-xs text-slate-500 font-semibold mb-4">Skincare, Plushies & Boba</p>
+          <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:-rotate-6">🦄</div>
+          <button onclick="pullGacha('pastel', 100)" class="btn-pastel w-full bg-gradient-to-r from-pink-400 to-purple-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg">
+            Spin (🪙 100)
+          </button>
+        </div>
+
+        <!-- 2. Cyber Tech -->
+        <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-cyan-400 relative group overflow-hidden">
+          <div class="absolute -left-6 -bottom-6 w-24 h-24 bg-cyan-200 rounded-full blur-2xl opacity-50"></div>
+          <h3 class="text-xl font-black text-slate-800 mb-1">Cyber Tech</h3>
+          <p class="text-xs text-slate-500 font-semibold mb-4">Hardware, RGB & Gadgets</p>
+          <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-6 text-cyan-500 drop-shadow-md">🎮</div>
+          <button onclick="pullGacha('cyber', 200)" class="btn-pastel w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg">
+            Spin (🪙 200)
+          </button>
+        </div>
+
+        <!-- 3. Streetwear Hype -->
+        <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-orange-500 relative group overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-orange-200 rounded-full blur-2xl opacity-50"></div>
+          <h3 class="text-xl font-black text-slate-800 mb-1">Streetwear</h3>
+          <p class="text-xs text-slate-500 font-semibold mb-4">Sneakers, Hoodies & Drip</p>
+          <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:-translate-y-2 drop-shadow-lg">👟</div>
+          <button onclick="pullGacha('street', 300)" class="btn-pastel w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg">
+            Spin (🪙 300)
+          </button>
+        </div>
+
+        <!-- 4. Golden Luxury -->
+        <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-amber-400 relative group overflow-hidden bg-gradient-to-b from-white to-amber-50/30">
+          <div class="absolute inset-0 bg-amber-200 opacity-20 blur-3xl rounded-full"></div>
+          <h3 class="text-xl font-black text-slate-800 mb-1 text-amber-600">Golden Luxury</h3>
+          <p class="text-xs text-slate-500 font-semibold mb-4">Watches, Bags & Art</p>
+          <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-12 drop-shadow-xl">👑</div>
+          <button onclick="pullGacha('luxury', 500)" class="btn-pastel w-full bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 text-white font-black py-3 px-4 rounded-xl shadow-lg border border-amber-300">
+            Premium Spin (🪙 500)
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 3: DECOR & VISUAL BUFFS
+         ========================================== -->
+    <section id="view-decor" class="tab-view hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-3xl font-black text-slate-800">Store Upgrades</h2>
+          <p class="text-sm text-slate-600 font-medium">Invest profits into decor to gain permanent synergistic buffs (Sales Speed, VIP Chance, Global Hype).</p>
+        </div>
+      </div>
+      <div id="decorGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Populated by renderDecor() -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 4: COLLECTION VAULT
+         ========================================== -->
+    <section id="view-collection" class="tab-view hidden space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+        <div>
+          <h2 class="text-3xl font-black text-slate-800">Product Vault</h2>
+          <p class="text-sm text-slate-600 font-medium">Review unlocked items and market lore.</p>
+        </div>
+        <div class="bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow">
+          Unlocked: <span id="vaultCount">0</span> / 60
+        </div>
+      </div>
+
+      <div id="galleryGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+        <!-- Populated by renderGallery() -->
+      </div>
+      
+      <!-- Hard Reset Button -->
+      <div class="mt-12 text-center border-t border-rose-100 pt-8">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+          <button onclick="exportSaveData()" class="btn-pastel bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-xl shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-copy"></i> Export Save Code
+          </button>
+          <button onclick="importSaveData()" class="btn-pastel bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-xl shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-download"></i> Import Save Code
+          </button>
+        </div>
+        <button onclick="if(confirm('Wipe all progress?')) { localStorage.clear(); location.reload(); }" class="text-xs font-bold text-rose-400 hover:text-rose-600 underline">Hard Reset Game Data</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       MODALS & POPUPS
+       ========================================== -->
+  
+  <!-- 1. Gacha Reveal Modal -->
+  <div id="modalGacha" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="gachaCard" class="glass-card rounded-[2rem] p-8 max-w-sm w-full text-center relative transform transition-all duration-300 scale-90 opacity-0">
+      <div id="gachaRevealRarityBadge" class="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1.5 rounded-full font-black text-sm uppercase tracking-widest text-white shadow-lg">
+        RARE
+      </div>
+      <div id="gachaRevealIcon" class="text-8xl my-6 drop-shadow-xl transform transition-transform animate-bounce">
+        📦
+      </div>
+      <h3 id="gachaRevealName" class="text-2xl font-black text-slate-800 font-outfit">Item Name</h3>
+      <p id="gachaRevealDesc" class="text-xs text-slate-500 font-medium mt-2 mb-6">Lore text goes here regarding elasticity and appeal.</p>
+
+      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-sm text-slate-700 mb-6 space-y-2">
+        <div class="flex justify-between items-center"><span class="font-bold">Wholesale Cost:</span> <span id="gachaRevealCost" class="font-black text-slate-900">🪙 0</span></div>
+        <div class="flex justify-between items-center"><span class="font-bold">Suggested MSRP:</span> <span id="gachaRevealRetail" class="font-black text-emerald-600">🪙 0</span></div>
+      </div>
+
+      <button onclick="closeModal('modalGacha')" class="btn-pastel w-full bg-slate-800 text-white font-bold py-4 rounded-xl text-lg">
+        Add to Inventory
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. End of Day Settlement Modal -->
+  <div id="modalSettlement" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="settlementCard" class="bg-white rounded-[2rem] max-w-lg w-full overflow-hidden shadow-2xl relative transform transition-all duration-300 scale-90 opacity-0 flex flex-col max-h-[90vh]">
+      <!-- Header -->
+      <div class="bg-slate-900 p-6 text-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjEiLz48cGF0aCBkPSJNMCAwTDggOFpNOCAwTDAgOFoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9zdmc+')]"></div>
+        <h3 class="text-3xl font-black text-white relative z-10 font-outfit uppercase tracking-wider">Shift Complete</h3>
+        <p class="text-slate-300 text-xs font-semibold relative z-10 mt-1">Financial & Sales Breakdown</p>
+        
+        <div id="settlementStars" class="relative z-10 mt-3 text-3xl text-amber-400 drop-shadow-md tracking-widest">
+          ★★★★★
+        </div>
+        <div id="settlementFeedback" class="relative z-10 mt-2 text-[10px] font-bold text-white uppercase bg-white/20 inline-block px-3 py-1 rounded-full backdrop-blur-sm">
+          Perfect 4P Alignment!
+        </div>
+      </div>
+      
+      <!-- List of Sold Items -->
+      <div id="settlementList" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 min-h-[150px] max-h-[300px] overflow-x-hidden">
+        <!-- Dynamically populated rows -->
+      </div>
+
+      <!-- Totals -->
+      <div class="p-6 bg-white border-t-2 border-slate-100 space-y-2">
+        <div class="flex justify-between text-slate-500 font-bold text-sm">
+          <span>Gross Revenue:</span>
+          <span id="settleGross" class="text-emerald-500">+🪙 0</span>
+        </div>
+        <div class="flex justify-between text-slate-500 font-bold text-sm">
+          <span>COGS (Cost of Goods):</span>
+          <span id="settleCost" class="text-rose-500">-🪙 0</span>
+        </div>
+        <div class="flex justify-between text-slate-900 font-black text-2xl pt-2 border-t border-slate-100 mt-2 font-outfit">
+          <span>Net Profit:</span>
+          <span id="settleNet">🪙 0</span>
+        </div>
+        <button onclick="closeModal('modalSettlement')" class="btn-pastel w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 rounded-xl mt-4 text-lg shadow-lg">
+          Collect Earnings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastBox" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script>
+    /* ==========================================================================
+       1. DATA MODELS: 60 Unique Products & Decor
+       ========================================================================== */
+    const RARITY = { C: 'Common', R: 'Rare', SSR: 'SSR', UR: 'UR' };
+    const DEMAND = { INELASTIC: 'Inelastic (Iron Rod)', ELASTIC: 'Elastic (Rubber Band)' };
+    
+    // Generates 15 items per theme to guarantee 60 items total.
+    const PRODUCTS_CATALOG = [
+      // --- PASTEL DREAM ---
+      { id: 'p1', theme: 'pastel', name: 'Pastel Sticky Notes', rarity: RARITY.C, emoji: '📝', elasticity: DEMAND.INELASTIC, unitCost: 5, basePrice: 10, lore: 'Basic student need. Very inelastic.' },
+      { id: 'p2', theme: 'pastel', name: 'Lip Balm', rarity: RARITY.C, emoji: '💄', elasticity: DEMAND.INELASTIC, unitCost: 8, basePrice: 15, lore: 'Everyday essential.' },
+      { id: 'p3', theme: 'pastel', name: 'Bath Bomb', rarity: RARITY.C, emoji: '🛁', elasticity: DEMAND.ELASTIC, unitCost: 12, basePrice: 25, lore: 'Fun but optional luxury.' },
+      { id: 'p4', theme: 'pastel', name: 'Sheet Mask', rarity: RARITY.C, emoji: '🎭', elasticity: DEMAND.INELASTIC, unitCost: 10, basePrice: 18, lore: 'Routine skincare.' },
+      { id: 'p5', theme: 'pastel', name: 'Pastel Pen Set', rarity: RARITY.C, emoji: '🖊️', elasticity: DEMAND.ELASTIC, unitCost: 15, basePrice: 28, lore: 'Aesthetic but easily substituted.' },
+      { id: 'p6', theme: 'pastel', name: 'Fluffy Socks', rarity: RARITY.C, emoji: '🧦', elasticity: DEMAND.INELASTIC, unitCost: 10, basePrice: 20, lore: 'Comfort item.' },
+      { id: 'p7', theme: 'pastel', name: 'Strawberry Milk', rarity: RARITY.R, emoji: '🍓', elasticity: DEMAND.INELASTIC, unitCost: 20, basePrice: 35, lore: 'Cult favorite drink.' },
+      { id: 'p8', theme: 'pastel', name: 'Boba Tea', rarity: RARITY.R, emoji: '🧋', elasticity: DEMAND.ELASTIC, unitCost: 25, basePrice: 45, lore: 'Trendy but price sensitive.' },
+      { id: 'p9', theme: 'pastel', name: 'Cute Plushie', rarity: RARITY.R, emoji: '🧸', elasticity: DEMAND.ELASTIC, unitCost: 35, basePrice: 70, lore: 'Impulse buy.' },
+      { id: 'p10', theme: 'pastel', name: 'Desk Mat', rarity: RARITY.R, emoji: '🖱️', elasticity: DEMAND.INELASTIC, unitCost: 40, basePrice: 75, lore: 'Needed for aesthetic setups.' },
+      { id: 'p11', theme: 'pastel', name: 'Macaron Box', rarity: RARITY.R, emoji: '🧁', elasticity: DEMAND.ELASTIC, unitCost: 30, basePrice: 60, lore: 'Premium snack.' },
+      { id: 'p12', theme: 'pastel', name: 'Skincare Serum', rarity: RARITY.SSR, emoji: '✨', elasticity: DEMAND.INELASTIC, unitCost: 80, basePrice: 160, lore: 'Loyal user base.' },
+      { id: 'p13', theme: 'pastel', name: 'Sakura Keyboard', rarity: RARITY.SSR, emoji: '⌨️', elasticity: DEMAND.ELASTIC, unitCost: 120, basePrice: 250, lore: 'High value aesthetic tech.' },
+      { id: 'p14', theme: 'pastel', name: 'Lolita Dress', rarity: RARITY.SSR, emoji: '👗', elasticity: DEMAND.ELASTIC, unitCost: 150, basePrice: 320, lore: 'Niche fashion statement.' },
+      { id: 'p15', theme: 'pastel', name: 'Golden Axolotl', rarity: RARITY.UR, emoji: '🦎', elasticity: DEMAND.INELASTIC, unitCost: 400, basePrice: 1000, lore: 'Mythical rarity. Price is no object.' },
+
+      // --- CYBER TECH ---
+      { id: 'c1', theme: 'cyber', name: 'Cable Ties', rarity: RARITY.C, emoji: '🔗', elasticity: DEMAND.INELASTIC, unitCost: 4, basePrice: 10, lore: 'Must have for cable mgmt.' },
+      { id: 'c2', theme: 'cyber', name: 'Mousepad', rarity: RARITY.C, emoji: '⬛', elasticity: DEMAND.INELASTIC, unitCost: 8, basePrice: 16, lore: 'Basic necessity.' },
+      { id: 'c3', theme: 'cyber', name: 'USB Drive', rarity: RARITY.C, emoji: '💾', elasticity: DEMAND.ELASTIC, unitCost: 12, basePrice: 24, lore: 'Common storage.' },
+      { id: 'c4', theme: 'cyber', name: 'RGB Strip', rarity: RARITY.C, emoji: '🌈', elasticity: DEMAND.ELASTIC, unitCost: 15, basePrice: 30, lore: 'Cheap aesthetic upgrade.' },
+      { id: 'c5', theme: 'cyber', name: 'Keycap Puller', rarity: RARITY.C, emoji: '🔧', elasticity: DEMAND.INELASTIC, unitCost: 5, basePrice: 12, lore: 'Tool.' },
+      { id: 'c6', theme: 'cyber', name: 'Screen Wipes', rarity: RARITY.C, emoji: '🧻', elasticity: DEMAND.INELASTIC, unitCost: 6, basePrice: 14, lore: 'Consumable.' },
+      { id: 'c7', theme: 'cyber', name: 'Gaming Mouse', rarity: RARITY.R, emoji: '🖱️', elasticity: DEMAND.ELASTIC, unitCost: 45, basePrice: 90, lore: 'Competitive gear.' },
+      { id: 'c8', theme: 'cyber', name: 'Power Bank', rarity: RARITY.R, emoji: '🔋', elasticity: DEMAND.INELASTIC, unitCost: 35, basePrice: 65, lore: 'Vital for travel.' },
+      { id: 'c9', theme: 'cyber', name: 'SSD Drive', rarity: RARITY.R, emoji: '💽', elasticity: DEMAND.INELASTIC, unitCost: 60, basePrice: 110, lore: 'Crucial storage upgrade.' },
+      { id: 'c10', theme: 'cyber', name: 'Controller', rarity: RARITY.R, emoji: '🎮', elasticity: DEMAND.ELASTIC, unitCost: 50, basePrice: 95, lore: 'Console gaming need.' },
+      { id: 'c11', theme: 'cyber', name: 'Headset Stand', rarity: RARITY.R, emoji: '🗼', elasticity: DEMAND.ELASTIC, unitCost: 25, basePrice: 50, lore: 'Desk accessory.' },
+      { id: 'c12', theme: 'cyber', name: 'Graphics Card', rarity: RARITY.SSR, emoji: '🖥️', elasticity: DEMAND.INELASTIC, unitCost: 250, basePrice: 550, lore: 'Scarcity drives inelastic demand.' },
+      { id: 'c13', theme: 'cyber', name: 'Racing Drone', rarity: RARITY.SSR, emoji: '🚁', elasticity: DEMAND.ELASTIC, unitCost: 180, basePrice: 400, lore: 'Hobbyist gear.' },
+      { id: 'c14', theme: 'cyber', name: 'VR Headset', rarity: RARITY.SSR, emoji: '🥽', elasticity: DEMAND.ELASTIC, unitCost: 220, basePrice: 480, lore: 'Next gen tech.' },
+      { id: 'c15', theme: 'cyber', name: 'Quantum Chip', rarity: RARITY.UR, emoji: '💠', elasticity: DEMAND.INELASTIC, unitCost: 600, basePrice: 1500, lore: 'Unrivaled processing power.' },
+
+      // --- STREETWEAR HYPE ---
+      { id: 's1', theme: 'street', name: 'Beanie', rarity: RARITY.C, emoji: '🧢', elasticity: DEMAND.ELASTIC, unitCost: 10, basePrice: 22, lore: 'Basic headwear.' },
+      { id: 's2', theme: 'street', name: 'Ankle Socks', rarity: RARITY.C, emoji: '🧦', elasticity: DEMAND.INELASTIC, unitCost: 8, basePrice: 16, lore: 'Wardrobe staple.' },
+      { id: 's3', theme: 'street', name: 'Shoelaces', rarity: RARITY.C, emoji: '🧵', elasticity: DEMAND.INELASTIC, unitCost: 5, basePrice: 12, lore: 'Utility item.' },
+      { id: 's4', theme: 'street', name: 'Tote Bag', rarity: RARITY.C, emoji: '🛍️', elasticity: DEMAND.ELASTIC, unitCost: 15, basePrice: 30, lore: 'Casual carry.' },
+      { id: 's5', theme: 'street', name: 'Wristband', rarity: RARITY.C, emoji: '🎗️', elasticity: DEMAND.ELASTIC, unitCost: 6, basePrice: 15, lore: 'Cheap accessory.' },
+      { id: 's6', theme: 'street', name: 'Sticker Pack', rarity: RARITY.C, emoji: '🏷️', elasticity: DEMAND.ELASTIC, unitCost: 4, basePrice: 10, lore: 'Laptop deco.' },
+      { id: 's7', theme: 'street', name: 'Graphic Tee', rarity: RARITY.R, emoji: '👕', elasticity: DEMAND.ELASTIC, unitCost: 30, basePrice: 65, lore: 'Fashion expression.' },
+      { id: 's8', theme: 'street', name: 'Snapback', rarity: RARITY.R, emoji: '🧢', elasticity: DEMAND.ELASTIC, unitCost: 25, basePrice: 55, lore: 'Street staple.' },
+      { id: 's9', theme: 'street', name: 'Sling Bag', rarity: RARITY.R, emoji: '🎒', elasticity: DEMAND.INELASTIC, unitCost: 40, basePrice: 80, lore: 'Functional fashion.' },
+      { id: 's10', theme: 'street', name: 'Cargo Pants', rarity: RARITY.R, emoji: '👖', elasticity: DEMAND.INELASTIC, unitCost: 50, basePrice: 100, lore: 'Durable utility.' },
+      { id: 's11', theme: 'street', name: 'Skateboard', rarity: RARITY.R, emoji: '🛹', elasticity: DEMAND.ELASTIC, unitCost: 60, basePrice: 120, lore: 'Mobility & style.' },
+      { id: 's12', theme: 'street', name: 'Limited Sneakers', rarity: RARITY.SSR, emoji: '👟', elasticity: DEMAND.INELASTIC, unitCost: 180, basePrice: 450, lore: 'Hype creates iron rod demand.' },
+      { id: 's13', theme: 'street', name: 'Designer Hoodie', rarity: RARITY.SSR, emoji: '🧥', elasticity: DEMAND.ELASTIC, unitCost: 140, basePrice: 300, lore: 'Premium comfort.' },
+      { id: 's14', theme: 'street', name: 'Hype Chain', rarity: RARITY.SSR, emoji: '⛓️', elasticity: DEMAND.ELASTIC, unitCost: 120, basePrice: 280, lore: 'Status symbol.' },
+      { id: 's15', theme: 'street', name: 'Diamond Grill', rarity: RARITY.UR, emoji: '💎', elasticity: DEMAND.INELASTIC, unitCost: 800, basePrice: 2200, lore: 'Ultimate flex.' },
+
+      // --- GOLDEN LUXURY ---
+      { id: 'l1', theme: 'luxury', name: 'Silk Tie', rarity: RARITY.C, emoji: '👔', elasticity: DEMAND.ELASTIC, unitCost: 25, basePrice: 55, lore: 'Formal wear.' },
+      { id: 'l2', theme: 'luxury', name: 'Pocket Square', rarity: RARITY.C, emoji: '🔲', elasticity: DEMAND.ELASTIC, unitCost: 15, basePrice: 35, lore: 'Suit accent.' },
+      { id: 'l3', theme: 'luxury', name: 'Cufflinks', rarity: RARITY.C, emoji: '🔗', elasticity: DEMAND.ELASTIC, unitCost: 30, basePrice: 65, lore: 'Small detail.' },
+      { id: 'l4', theme: 'luxury', name: 'Perfume Sample', rarity: RARITY.C, emoji: '🧪', elasticity: DEMAND.INELASTIC, unitCost: 20, basePrice: 45, lore: 'Entry to luxury.' },
+      { id: 'l5', theme: 'luxury', name: 'Leather Wallet', rarity: RARITY.C, emoji: '👝', elasticity: DEMAND.INELASTIC, unitCost: 40, basePrice: 85, lore: 'Daily necessity.' },
+      { id: 'l6', theme: 'luxury', name: 'Money Clip', rarity: RARITY.C, emoji: '📎', elasticity: DEMAND.ELASTIC, unitCost: 20, basePrice: 45, lore: 'Minimalist carry.' },
+      { id: 'l7', theme: 'luxury', name: 'Fountain Pen', rarity: RARITY.R, emoji: '🖋️', elasticity: DEMAND.INELASTIC, unitCost: 80, basePrice: 160, lore: 'Executive tool.' },
+      { id: 'l8', theme: 'luxury', name: 'Cashmere Scarf', rarity: RARITY.R, emoji: '🧣', elasticity: DEMAND.ELASTIC, unitCost: 100, basePrice: 210, lore: 'Winter luxury.' },
+      { id: 'l9', theme: 'luxury', name: 'Caviar Tin', rarity: RARITY.R, emoji: '🐟', elasticity: DEMAND.ELASTIC, unitCost: 150, basePrice: 300, lore: 'Gourmet status.' },
+      { id: 'l10', theme: 'luxury', name: 'Crystal Glass', rarity: RARITY.R, emoji: '🥂', elasticity: DEMAND.ELASTIC, unitCost: 70, basePrice: 150, lore: 'Fine dining.' },
+      { id: 'l11', theme: 'luxury', name: 'Sunglasses', rarity: RARITY.R, emoji: '🕶️', elasticity: DEMAND.INELASTIC, unitCost: 90, basePrice: 190, lore: 'Brand loyalty.' },
+      { id: 'l12', theme: 'luxury', name: 'Designer Bag', rarity: RARITY.SSR, emoji: '👜', elasticity: DEMAND.INELASTIC, unitCost: 400, basePrice: 950, lore: 'Veblen good. Price = Value.' },
+      { id: 'l13', theme: 'luxury', name: 'Gold Watch', rarity: RARITY.SSR, emoji: '⌚', elasticity: DEMAND.ELASTIC, unitCost: 500, basePrice: 1100, lore: 'Statement piece.' },
+      { id: 'l14', theme: 'luxury', name: 'Tailored Suit', rarity: RARITY.SSR, emoji: '🕴️', elasticity: DEMAND.INELASTIC, unitCost: 600, basePrice: 1300, lore: 'Bespoke fit.' },
+      { id: 'l15', theme: 'luxury', name: 'Masterpiece Art', rarity: RARITY.UR, emoji: '🖼️', elasticity: DEMAND.INELASTIC, unitCost: 1500, basePrice: 5000, lore: 'Priceless investment.' }
+    ];
+
+    const DECOR_CATALOG = [
+      { id: 'd1', name: 'POS Upgrade', type: 'speed', value: 0.15, cost: 800, emoji: '📠', desc: '+15% Checkout Speed (Customers spawn faster)' },
+      { id: 'd2', name: 'Neon Open Sign', type: 'hype', value: 0.20, cost: 1200, emoji: '💡', desc: '+20% Global Brand Hype' },
+      { id: 'd3', name: 'Marble Displays', type: 'vip', value: 0.10, cost: 2500, emoji: '🏛️', desc: '+10% Chance for VIP Customers (3x Spend)' },
+      { id: 'd4', name: 'Hyperloop Belt', type: 'speed', value: 0.25, cost: 4000, emoji: '⚙️', desc: '+25% Checkout Speed' },
+      { id: 'd5', name: 'Bose Sound Sys', type: 'hype', value: 0.30, cost: 6000, emoji: '🔊', desc: '+30% Global Brand Hype' },
+      { id: 'd6', name: 'Gold Mannequin', type: 'vip', value: 0.20, cost: 10000, emoji: '🧍', desc: '+20% Chance for VIP Customers' }
+    ];
+
+    const PLACE_COSTS = { ecommerce: 5, retail: 25, boutique: 100 };
+    const PROMO_COSTS = { organic: 0, social: 15, influencer: 60, premium: 150 };
+
+    /* ==========================================================================
+       2. GLOBAL STATE & PROGRESSION
+       ========================================================================== */
+    let gameState = {
+      coins: 1000, // Starting capital
+      maxSlots: 2, // Starts with 2 slots
+      gachaUnlocks: [], // Array of item IDs
+      equippedProducts: [null, null], // Array length matches maxSlots
+      decorations: [], // Array of decor IDs
+      activeStrategies: {}, // Pricing strategies mapped by item ID
+    };
+
+    const SLOT_UPGRADE_COSTS = { 3: 1500, 4: 5000, 5: 15000, 6: 40000 };
+    const SAVE_KEY = 'GachaMarketDeluxeV2';
+
+    function saveGame() {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
+      updateHUD();
+    }
+
+    function loadGame() {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (saved) {
+        try {
+          gameState = { ...gameState, ...JSON.parse(saved) };
+          // Sync equipped array length if upgraded
+          while (gameState.equippedProducts.length < gameState.maxSlots) {
+            gameState.equippedProducts.push(null);
+          }
+        } catch (e) { console.error('Save parse error'); }
+      }
+      updateHUD();
+      renderShelves();
+    }
+
+    /* ==========================================================================
+       3. CORE UTILITIES (Audio, UI, Math)
+       ========================================================================== */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+        gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now); osc.stop(now + 0.05);
+      } else if (type === 'coin') {
+        osc.frequency.setValueAtTime(987.77, now); // B5
+        osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+        gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now); osc.stop(now + 0.2);
+      } else if (type === 'gacha') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.linearRampToValueAtTime(400, now + 0.3);
+        gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now); osc.stop(now + 0.35);
+      } else if (type === 'ur') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now); osc.frequency.linearRampToValueAtTime(880, now + 0.2); osc.frequency.linearRampToValueAtTime(1760, now + 0.5);
+        gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.8);
+        osc.start(now); osc.stop(now + 0.8);
+      }
+    }
+
+    function showToast(msg, isError = false) {
+      const box = document.getElementById('toastBox');
+      const toast = document.createElement('div');
+      toast.className = `text-white text-sm font-bold px-5 py-3 rounded-xl shadow-xl backdrop-blur-md animate-bounce border ${isError ? 'bg-rose-600/90 border-rose-500' : 'bg-slate-800/90 border-slate-700'}`;
+      toast.innerText = msg;
+      box.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s';
+        setTimeout(() => toast.remove(), 500);
+      }, 2500);
+    }
+
+    function switchTab(tabId) {
+      playSound('click');
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-tab').forEach(el => {
+        el.classList.remove('bg-slate-800', 'text-white', 'shadow-md');
+        el.classList.add('bg-white', 'text-slate-600');
+      });
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      document.getElementById(`tabBtn-${tabId}`).classList.add('bg-slate-800', 'text-white', 'shadow-md');
+      document.getElementById(`tabBtn-${tabId}`).classList.remove('bg-white', 'text-slate-600');
+      
+      if(tabId === 'shop') renderShelves();
+      if(tabId === 'collection') renderGallery();
+      if(tabId === 'decor') renderDecor();
+    }
+
+    function getBuffs() {
+      let speed = 0, hype = 1.0, vipChance = 0;
+      gameState.decorations.forEach(dId => {
+        const d = DECOR_CATALOG.find(x => x.id === dId);
+        if (d.type === 'speed') speed += d.value;
+        if (d.type === 'hype') hype += d.value;
+        if (d.type === 'vip') vipChance += d.value;
+      });
+      return { speed, hype, vipChance };
+    }
+
+    function updateHUD() {
+      document.getElementById('hudCoins').innerText = gameState.coins.toLocaleString();
+      const buffs = getBuffs();
+      document.getElementById('hudHype').innerText = `${buffs.hype.toFixed(2)}x`;
+      document.getElementById('hudSpeed').innerText = `+${Math.round(buffs.speed * 100)}%`;
+
+      // Update Visual Header
+      const headerLayer = document.getElementById('decorItemsLayer');
+      headerLayer.innerHTML = '';
+      gameState.decorations.forEach(dId => {
+        const d = DECOR_CATALOG.find(x => x.id === dId);
+        const el = document.createElement('div');
+        el.className = 'animate-bounce drop-shadow-md';
+        el.innerHTML = d.emoji;
+        headerLayer.appendChild(el);
+      });
+    }
+
+    function evaluateStrategy(product, strat) {
+      let stars = 3; // Base start
+      let feedback = [];
+
+      // 1. Price vs Elasticity
+      const ratio = strat.priceRatio;
+      if (product.elasticity.includes('Elastic')) {
+          if (ratio > 1.5) { stars -= 1; feedback.push("Price too high for an elastic product."); }
+          else if (ratio <= 1.0) { stars += 1; }
+      } else {
+          if (ratio < 1.0) { stars -= 0.5; feedback.push("Leaving money on the table for inelastic goods."); }
+          else if (ratio >= 1.5 && ratio <= 2.5) { stars += 1; }
+      }
+
+      // 2. Place vs Rarity
+      if (['UR', 'SSR'].includes(product.rarity)) {
+          if (strat.place === 'ecommerce') { stars -= 1.5; feedback.push("Premium goods look cheap online. Use Boutique."); }
+          else if (strat.place === 'boutique') { stars += 1; }
+      } else {
+          if (strat.place === 'boutique') { stars -= 1; feedback.push("Boutique rent is wasted on common goods."); }
+          else if (strat.place === 'ecommerce' || strat.place === 'retail') { stars += 0.5; }
+      }
+
+      // 3. Promo vs Theme/Rarity
+      if (product.rarity === 'UR' && strat.promo !== 'premium') { stars -= 1; feedback.push("UR items require Premium campaigns."); }
+      if (product.rarity === 'UR' && strat.promo === 'premium') { stars += 1; }
+      if (strat.promo === 'organic' && ratio > 1.2) { stars -= 1; feedback.push("High prices need active promotion!"); }
+      if (product.rarity === 'Common' && strat.promo === 'premium') { stars -= 1; feedback.push("Premium promo costs too much for commons."); }
+
+      // Clamp stars between 1 and 5
+      stars = Math.max(1, Math.min(5, Math.round(stars)));
+      
+      // Multiplier effect on customer purchase chance
+      const multipliers = { 1: 0.2, 2: 0.6, 3: 1.0, 4: 1.5, 5: 2.5 };
+      
+      return { 
+        stars, 
+        multiplier: multipliers[stars], 
+        feedback: feedback[0] || "Excellent 4P Strategy Alignment!" 
+      };
+    }
+
+    /* ==========================================================================
+       4. SHOP MANAGEMENT (Slots, Pricing)
+       ========================================================================== */
+    function renderShelves() {
+      const container = document.getElementById('shelvesGrid');
+      container.innerHTML = '';
+
+      for (let i = 0; i < 6; i++) {
+        const card = document.createElement('div');
+        
+        // Locked Slot Logic
+        if (i >= gameState.maxSlots) {
+          if (i === gameState.maxSlots) { // Next purchasable
+            const cost = SLOT_UPGRADE_COSTS[i + 1];
+            card.className = 'border-2 border-dashed border-indigo-300 rounded-[2rem] p-6 flex flex-col items-center justify-center text-center bg-indigo-50/50 hover:bg-indigo-50 transition-colors cursor-pointer';
+            card.onclick = () => purchaseSlot(i + 1, cost);
+            card.innerHTML = `
+              <div class="text-4xl text-indigo-300 mb-3"><i class="fa-solid fa-plus-circle"></i></div>
+              <h4 class="font-bold text-slate-700">Expand Display</h4>
+              <p class="text-xs text-slate-500 mb-3">Add slot ${i + 1} to inventory.</p>
+              <button class="bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-md">Buy (🪙 ${cost.toLocaleString()})</button>
+            `;
+          } else { // Locked completely
+            card.className = 'border-2 border-dashed border-slate-200 rounded-[2rem] p-6 flex flex-col items-center justify-center text-center bg-slate-50 opacity-50';
+            card.innerHTML = `
+              <div class="text-3xl text-slate-300 mb-2"><i class="fa-solid fa-lock"></i></div>
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Locked</p>
+            `;
+          }
+          container.appendChild(card);
+          continue;
+        }
+
+        // Active Slot Logic
+        card.className = 'glass-card rounded-[2rem] p-5 border border-slate-200 relative flex flex-col justify-between';
+        const prodId = gameState.equippedProducts[i];
+        
+        if (!prodId) {
+          card.innerHTML = `
+            <div class="flex-grow flex flex-col items-center justify-center text-center py-6">
+              <div class="text-4xl text-slate-200 mb-2"><i class="fa-solid fa-box-open"></i></div>
+              <p class="text-sm font-bold text-slate-500">Empty Display</p>
+              <button onclick="openEquipModal(${i})" class="mt-4 bg-slate-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow hover:bg-slate-700">Equip Product</button>
+            </div>
+          `;
+        } else {
+          const product = PRODUCTS_CATALOG.find(p => p.id === prodId);
+          let strat = gameState.activeStrategies[prodId] || { priceRatio: 1.0, place: 'ecommerce', promo: 'organic' };
+          if (!strat.place) strat.place = 'ecommerce';
+          if (!strat.promo) strat.promo = 'organic';
+          gameState.activeStrategies[prodId] = strat;
+          
+          const currentPrice = Math.round(product.basePrice * strat.priceRatio);
+          const rarityColor = product.rarity === 'UR' ? 'ur-border ur-glow' : product.rarity === 'SSR' ? 'text-amber-500 border-amber-200 bg-amber-50' : product.rarity === 'Rare' ? 'text-purple-500 border-purple-200 bg-purple-50' : 'text-blue-500 border-blue-200 bg-blue-50';
+
+          card.innerHTML = `
+            <div>
+              <div class="flex justify-between items-start mb-3">
+                <span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${rarityColor}">${product.rarity}</span>
+                <button onclick="unequipSlot(${i})" class="text-slate-400 hover:text-rose-500 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+              </div>
+              <div class="flex items-center gap-4 mb-4">
+                <div class="text-5xl drop-shadow-md">${product.emoji}</div>
+                <div>
+                  <h4 class="font-black text-slate-800 text-lg leading-tight">${product.name}</h4>
+                  <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">Cost: 🪙${product.unitCost}</div>
+                  <div class="text-[10px] font-bold ${product.elasticity.includes('Inelastic') ? 'text-indigo-500' : 'text-orange-500'} uppercase">${product.elasticity}</div>
+                </div>
+              </div>
+              
+              <!-- Strategy Controls -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mt-auto space-y-3">
+                
+                <!-- Price -->
+                <div>
+                  <div class="flex justify-between font-black text-slate-800 text-sm mb-1">
+                    <span>Price (P1):</span>
+                    <span class="text-emerald-600">🪙 ${currentPrice}</span>
+                  </div>
+                  <input type="range" min="0.5" max="4.0" step="0.1" value="${strat.priceRatio}" 
+                    onchange="updateStrategy('${prodId}', 'priceRatio', parseFloat(this.value))"
+                    class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer slider-thumb text-slate-800">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Place (P3)</label>
+                    <select onchange="updateStrategy('${prodId}', 'place', this.value)" class="w-full bg-white border border-slate-200 rounded-lg text-[10px] sm:text-xs p-1.5 font-bold text-slate-700 outline-none shadow-sm cursor-pointer">
+                      <option value="ecommerce" ${strat.place === 'ecommerce' ? 'selected' : ''}>E-Commerce (🪙5)</option>
+                      <option value="retail" ${strat.place === 'retail' ? 'selected' : ''}>Retail Store (🪙25)</option>
+                      <option value="boutique" ${strat.place === 'boutique' ? 'selected' : ''}>Boutique (🪙100)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Promo (P4)</label>
+                    <select onchange="updateStrategy('${prodId}', 'promo', this.value)" class="w-full bg-white border border-slate-200 rounded-lg text-[10px] sm:text-xs p-1.5 font-bold text-slate-700 outline-none shadow-sm cursor-pointer">
+                      <option value="organic" ${strat.promo === 'organic' ? 'selected' : ''}>Organic (🪙0)</option>
+                      <option value="social" ${strat.promo === 'social' ? 'selected' : ''}>Social Ads (🪙15)</option>
+                      <option value="influencer" ${strat.promo === 'influencer' ? 'selected' : ''}>Influencer (🪙60)</option>
+                      <option value="premium" ${strat.promo === 'premium' ? 'selected' : ''}>Premium (🪙150)</option>
+                    </select>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          `;
+        }
+        container.appendChild(card);
+      }
+    }
+
+    function purchaseSlot(targetSlot, cost) {
+      if (gameState.coins < cost) {
+        showToast('Not enough coins to expand!', true);
+        return;
+      }
+      playSound('coin');
+      gameState.coins -= cost;
+      gameState.maxSlots = targetSlot;
+      gameState.equippedProducts.push(null);
+      saveGame();
+      renderShelves();
+    }
+
+    function unequipSlot(index) {
+      playSound('click');
+      gameState.equippedProducts[index] = null;
+      saveGame();
+      renderShelves();
+    }
+
+    function updateStrategy(prodId, key, val) {
+      gameState.activeStrategies[prodId][key] = val;
+      saveGame();
+      renderShelves();
+    }
+
+    function openEquipModal(slotIdx) {
+      playSound('click');
+      const available = PRODUCTS_CATALOG.filter(p => gameState.gachaUnlocks.includes(p.id) && !gameState.equippedProducts.includes(p.id));
+      
+      if (available.length === 0) {
+        showToast('No unequipped items! Spin the Gacha.', true);
+        return;
+      }
+
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+      modal.innerHTML = `
+        <div class="bg-white rounded-[2rem] p-6 max-w-md w-full shadow-2xl animate-bounceIn">
+          <h3 class="text-2xl font-black text-slate-800 mb-4">Stock Shelf ${slotIdx + 1}</h3>
+          <div class="space-y-2 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
+            ${available.map(p => `
+              <div onclick="document.body.removeChild(this.closest('.fixed')); equipItem('${p.id}', ${slotIdx})" class="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition-colors">
+                <div class="flex items-center gap-3">
+                  <span class="text-3xl">${p.emoji}</span>
+                  <div>
+                    <h5 class="font-bold text-sm text-slate-800">${p.name}</h5>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">${p.rarity} | Cost: 🪙${p.unitCost}</span>
+                  </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-slate-400"></i>
+              </div>
+            `).join('')}
+          </div>
+          <button onclick="document.body.removeChild(this.closest('.fixed'))" class="w-full mt-4 py-3 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300">Cancel</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    function equipItem(id, slot) {
+      playSound('click');
+      gameState.equippedProducts[slot] = id;
+      saveGame();
+      renderShelves();
+    }
+
+    /* ==========================================================================
+       5. LIVE CUSTOMER RUSH ENGINE
+       ========================================================================== */
+    let rushInterval, spawnInterval;
+    let isRushActive = false;
+    let sessionStats = { gross: 0, cost: 0, details: {} };
+
+    function startShopRush() {
+      const activeItems = gameState.equippedProducts.filter(x => x !== null);
+      if (activeItems.length === 0) {
+        showToast('You must display at least 1 product!', true);
+        return;
+      }
+
+      playSound('ur'); // Exciting start sound
+      isRushActive = true;
+      
+      sessionStats = { gross: 0, cost: 0, details: {}, totalStars: 0, strategyEvaluations: [] };
+      
+      let overheadCost = 0;
+      activeItems.forEach(id => {
+        const strat = gameState.activeStrategies[id];
+        overheadCost += (PLACE_COSTS[strat.place] || 0) + (PROMO_COSTS[strat.promo] || 0);
+        
+        const product = PRODUCTS_CATALOG.find(p => p.id === id);
+        const evalResult = evaluateStrategy(product, strat);
+        sessionStats.strategyEvaluations.push(evalResult);
+        sessionStats.totalStars += evalResult.stars;
+      });
+      
+      // Deduct strategy setup costs immediately for the shift
+      sessionStats.cost += overheadCost;
+      
+      document.getElementById('shopRushContainer').classList.remove('hidden');
+      document.getElementById('liveRevenue').innerText = '🪙 0';
+      document.getElementById('btnOpenBoutique').disabled = true;
+      
+      const floor = document.getElementById('shopperFloor');
+      floor.querySelectorAll('.shopper-avatar').forEach(e => e.remove());
+
+      let timeLeft = 15;
+      document.getElementById('rushTimerBadge').innerText = `${timeLeft}s`;
+
+      // 1-second countdown loop
+      rushInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('rushTimerBadge').innerText = `${timeLeft}s`;
+        if (timeLeft <= 0) endShopRush();
+      }, 1000);
+
+      // Spawner loop based on Decor Buffs
+      const buffs = getBuffs();
+      const baseSpawnDelay = 800; // ms
+      const adjustedDelay = Math.max(300, baseSpawnDelay * (1 - buffs.speed));
+
+      const spawner = () => {
+        if (!isRushActive) return;
+        spawnShopper(activeItems, buffs);
+        spawnInterval = setTimeout(spawner, adjustedDelay + (Math.random() * 300));
+      };
+      spawner();
+    }
+
+    function spawnShopper(activeItems, buffs) {
+      const floor = document.getElementById('shopperFloor');
+      const isVip = Math.random() < buffs.vipChance;
+      
+      const avatarContainer = document.createElement('div');
+      avatarContainer.className = 'shopper-avatar absolute bottom-2 flex items-center justify-center pointer-events-none z-20';
+      avatarContainer.style.left = '-50px';
+      
+      const face = isVip ? '🤴' : ['🧑','👨','👩','👱','👧','👦'][Math.floor(Math.random()*6)];
+      
+      avatarContainer.innerHTML = `
+        <div class="text-4xl filter drop-shadow-md" style="animation: walkBob 0.5s infinite alternate;">${face}</div>
+        <div class="item-carrier absolute -top-4 -right-4 text-2xl opacity-0 transition-opacity duration-300 drop-shadow-lg"></div>
+      `;
+      floor.appendChild(avatarContainer);
+
+      // AI Decision Logic
+      const chosenId = activeItems[Math.floor(Math.random() * activeItems.length)];
+      const product = PRODUCTS_CATALOG.find(p => p.id === chosenId);
+      const strat = gameState.activeStrategies[chosenId];
+      const setPrice = product.basePrice * strat.priceRatio;
+      
+      const evalResult = evaluateStrategy(product, strat);
+
+      // Elasticity curve mapping
+      let buyChance = 0.5; // Base 50%
+      const ratio = setPrice / product.basePrice;
+      
+      if (product.elasticity.includes('Elastic')) {
+        // Punish high price heavily
+        buyChance -= (ratio - 1) * 0.8; 
+      } else {
+        // Inelastic (Staples/Luxury) - forgives price hikes
+        buyChance -= (ratio - 1) * 0.2;
+      }
+      
+      // Global Hype Buff
+      buyChance *= buffs.hype;
+      
+      buyChance *= evalResult.multiplier;
+      
+      // Cap probabilities
+      buyChance = Math.max(0.05, Math.min(0.95, buyChance));
+      
+      const willBuy = Math.random() < buyChance;
+      let currentX = -50;
+      const targetX = 100 + Math.random() * 150; // Walk to center to 'decide'
+
+      const moveState = setInterval(() => {
+        if (!isRushActive) {
+          clearInterval(moveState);
+          avatarContainer.remove();
+          return;
+        }
+
+        currentX += 5;
+        avatarContainer.style.left = `${currentX}px`;
+
+        if (currentX >= targetX && !avatarContainer.dataset.decided) {
+          avatarContainer.dataset.decided = "true";
+          if (willBuy) {
+            playSound('click');
+            const qty = isVip ? 3 : 1;
+            const rev = setPrice * qty;
+            const cost = product.unitCost * qty;
+            
+            // Record Stats
+            sessionStats.gross += rev;
+            sessionStats.cost += cost;
+            if(!sessionStats.details[product.id]) sessionStats.details[product.id] = { product, qty: 0, rev: 0 };
+            sessionStats.details[product.id].qty += qty;
+            sessionStats.details[product.id].rev += rev;
+            
+            document.getElementById('liveRevenue').innerText = `🪙 ${Math.round(sessionStats.gross)}`;
+            
+            // Visual feedback
+            const carrier = avatarContainer.querySelector('.item-carrier');
+            carrier.innerText = product.emoji;
+            carrier.style.opacity = '1';
+            createFlyingCoin(currentX, 100, rev);
+
+            // Change target to checkout counter
+            avatarContainer.dataset.targetX = floor.clientWidth - 80;
+          } else {
+            // Rejection, walks away
+            avatarContainer.querySelector('div').style.filter = 'grayscale(100%) opacity(50%)';
+            avatarContainer.dataset.targetX = floor.clientWidth + 50;
+          }
+        }
+
+        // Walk to exit/checkout
+        if (avatarContainer.dataset.decided === "true") {
+          const dest = parseFloat(avatarContainer.dataset.targetX);
+          if (currentX > dest) {
+            clearInterval(moveState);
+            avatarContainer.remove();
+            if (willBuy) playSound('coin');
+          }
+        }
+      }, 30);
+    }
+
+    function createFlyingCoin(x, y, amount) {
+      const coin = document.createElement('div');
+      coin.className = 'absolute z-30 font-black text-amber-500 drop-shadow-md text-sm font-outfit';
+      coin.innerText = `+🪙${Math.round(amount)}`;
+      coin.style.left = `${x}px`;
+      coin.style.bottom = `${y}px`;
+      coin.style.animation = 'floatUpFade 1s cubic-bezier(0.25, 1, 0.5, 1) forwards';
+      document.getElementById('shopperFloor').appendChild(coin);
+      setTimeout(() => coin.remove(), 1000);
+    }
+
+    function endShopRush() {
+      isRushActive = false;
+      clearInterval(rushInterval);
+      clearTimeout(spawnInterval);
+      document.getElementById('btnOpenBoutique').disabled = false;
+
+      const net = sessionStats.gross - sessionStats.cost;
+      gameState.coins += net;
+      saveGame();
+
+      const activeCount = gameState.equippedProducts.filter(x => x !== null).length;
+      const avgStars = Math.round(sessionStats.totalStars / activeCount);
+      const starIcons = '★'.repeat(avgStars) + '☆'.repeat(5 - avgStars);
+      
+      document.getElementById('settlementStars').innerText = starIcons;
+      document.getElementById('settlementStars').className = `relative z-10 mt-3 text-3xl drop-shadow-md tracking-widest ${avgStars >= 4 ? 'text-amber-400' : avgStars === 3 ? 'text-blue-400' : 'text-rose-400'}`;
+      
+      // Grab the first piece of constructive feedback to show the player
+      const feedbackTexts = sessionStats.strategyEvaluations.map(e => e.feedback).filter(f => f && f !== "Excellent 4P Strategy Alignment!");
+      document.getElementById('settlementFeedback').innerText = feedbackTexts[0] || "Excellent 4P Strategy Alignment!";
+      document.getElementById('settlementFeedback').className = `relative z-10 mt-2 text-[10px] font-bold text-white uppercase bg-white/20 inline-block px-3 py-1 rounded-full backdrop-blur-sm ${avgStars <= 2 ? 'bg-rose-500/80 border border-rose-400' : ''}`;
+
+      // Populate Settlement Modal
+      const list = document.getElementById('settlementList');
+      list.innerHTML = '';
+      
+      const keys = Object.keys(sessionStats.details);
+      if (keys.length === 0) {
+        list.innerHTML = `<div class="text-center text-slate-500 py-8 font-bold">No sales made this shift! Lower your prices or increase hype.</div>`;
+      } else {
+        keys.forEach(k => {
+          const d = sessionStats.details[k];
+          list.innerHTML += `
+            <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">${d.product.emoji}</span>
+                <div>
+                  <h5 class="font-bold text-sm text-slate-800">${d.product.name}</h5>
+                  <p class="text-[10px] text-slate-500 uppercase font-bold">${d.qty}x Sold</p>
+                </div>
+              </div>
+              <div class="font-black text-emerald-500 font-outfit">🪙 ${Math.round(d.rev)}</div>
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('settleGross').innerText = `+🪙 ${Math.round(sessionStats.gross)}`;
+      document.getElementById('settleCost').innerText = `-🪙 ${Math.round(sessionStats.cost)}`;
+      document.getElementById('settleNet').innerText = `🪙 ${Math.round(net)}`;
+
+      // Show Modal & Particle Explosion
+      const modal = document.getElementById('modalSettlement');
+      const card = document.getElementById('settlementCard');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        card.classList.remove('scale-90', 'opacity-0');
+        triggerCoinExplosion();
+      }, 50);
+    }
+
+    function triggerCoinExplosion() {
+      playSound('coin');
+      for(let i=0; i<20; i++) {
+        const coin = document.createElement('div');
+        coin.innerText = '🪙';
+        coin.className = 'fixed z-[60] text-2xl pointer-events-none';
+        coin.style.left = '50%';
+        coin.style.top = '50%';
+        const tx = (Math.random() - 0.5) * 400 + 'px';
+        const ty = (Math.random() - 0.5) * 400 + 'px';
+        coin.style.setProperty('--tx', tx);
+        coin.style.setProperty('--ty', ty);
+        coin.style.animation = `coinExplosion 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
+        document.body.appendChild(coin);
+        setTimeout(() => coin.remove(), 800);
+      }
+    }
+
+    /* ==========================================================================
+       6. GACHA SYSTEM
+       ========================================================================== */
+    function pullGacha(theme, cost) {
+      if (gameState.coins < cost) {
+        showToast('Insufficient funds!', true);
+        return;
+      }
+      
+      gameState.coins -= cost;
+      saveGame();
+      playSound('gacha');
+
+      // 1. Filter pool by theme
+      const pool = PRODUCTS_CATALOG.filter(p => p.theme === theme);
+      
+      // 2. Determine Rarity (Probability scales slightly with cost)
+      let roll = Math.random();
+      let targetRarity = RARITY.C;
+      
+      if (cost >= 500) { // Luxury bias
+        if (roll < 0.3) targetRarity = RARITY.R;
+        else if (roll < 0.7) targetRarity = RARITY.SSR;
+        else targetRarity = RARITY.UR;
+      } else {
+        if (roll < 0.5) targetRarity = RARITY.C;
+        else if (roll < 0.8) targetRarity = RARITY.R;
+        else if (roll < 0.98) targetRarity = RARITY.SSR;
+        else targetRarity = RARITY.UR;
+      }
+
+      // 3. Select Item
+      const rarityPool = pool.filter(p => p.rarity === targetRarity);
+      const pulledItem = rarityPool[Math.floor(Math.random() * rarityPool.length)];
+
+      // 4. Save Unlock
+      if (!gameState.gachaUnlocks.includes(pulledItem.id)) {
+        gameState.gachaUnlocks.push(pulledItem.id);
+        saveGame();
+      }
+
+      // 5. Reveal UI
+      setTimeout(() => {
+        if (pulledItem.rarity === RARITY.UR) playSound('ur');
+        else playSound('coin');
+
+        const badge = document.getElementById('gachaRevealRarityBadge');
+        badge.innerText = pulledItem.rarity;
+        badge.className = `absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-1.5 rounded-full font-black text-sm uppercase tracking-widest shadow-lg ${
+          pulledItem.rarity === 'UR' ? 'ur-border ur-glow bg-white' : 
+          pulledItem.rarity === 'SSR' ? 'bg-amber-500 text-white' : 
+          pulledItem.rarity === 'Rare' ? 'bg-purple-500 text-white' : 'bg-blue-500 text-white'
+        }`;
+        
+        document.getElementById('gachaRevealIcon').innerText = pulledItem.emoji;
+        document.getElementById('gachaRevealName').innerText = pulledItem.name;
+        if(pulledItem.rarity === 'UR') document.getElementById('gachaRevealName').classList.add('ur-glow');
+        else document.getElementById('gachaRevealName').classList.remove('ur-glow');
+        
+        document.getElementById('gachaRevealDesc').innerText = pulledItem.lore;
+        document.getElementById('gachaRevealCost').innerText = `🪙 ${pulledItem.unitCost}`;
+        document.getElementById('gachaRevealRetail').innerText = `🪙 ${pulledItem.basePrice}`;
+
+        const modal = document.getElementById('modalGacha');
+        const card = document.getElementById('gachaCard');
+        modal.classList.remove('hidden');
+        setTimeout(() => card.classList.remove('scale-90', 'opacity-0'), 50);
+      }, 500);
+    }
+
+    /* ==========================================================================
+       7. DECOR & VAULT VIEWS
+       ========================================================================== */
+    function renderGallery() {
+      const grid = document.getElementById('galleryGrid');
+      grid.innerHTML = '';
+      document.getElementById('vaultCount').innerText = gameState.gachaUnlocks.length;
+
+      PRODUCTS_CATALOG.forEach(item => {
+        const isUnlocked = gameState.gachaUnlocks.includes(item.id);
+        const card = document.createElement('div');
+        
+        if (isUnlocked) {
+          const rarityColor = item.rarity === 'UR' ? 'ur-border ur-glow' : item.rarity === 'SSR' ? 'text-amber-500 border-amber-200 bg-amber-50' : item.rarity === 'Rare' ? 'text-purple-500 border-purple-200 bg-purple-50' : 'text-blue-500 border-blue-200 bg-blue-50';
+          card.className = `glass-card rounded-2xl p-3 text-center border-2 border-slate-200 flex flex-col justify-between items-center transition-transform hover:scale-105`;
+          card.innerHTML = `
+            <div class="text-3xl mb-1 drop-shadow-sm">${item.emoji}</div>
+            <h4 class="font-bold text-[10px] text-slate-800 leading-tight line-clamp-1 w-full">${item.name}</h4>
+            <span class="text-[8px] font-black uppercase px-2 py-0.5 rounded border mt-1 ${rarityColor}">${item.rarity}</span>
+          `;
+        } else {
+          card.className = `bg-slate-100 rounded-2xl p-3 text-center border-2 border-slate-200 opacity-60 flex flex-col justify-center items-center h-24`;
+          card.innerHTML = `<i class="fa-solid fa-lock text-slate-300 text-xl"></i>`;
+        }
+        grid.appendChild(card);
+      });
+    }
+
+    function renderDecor() {
+      const grid = document.getElementById('decorGrid');
+      grid.innerHTML = '';
+
+      DECOR_CATALOG.forEach(decor => {
+        const isOwned = gameState.decorations.includes(decor.id);
+        const card = document.createElement('div');
+        card.className = `glass-card rounded-[2rem] p-6 border-2 ${isOwned ? 'border-emerald-300 bg-emerald-50/20' : 'border-slate-200'} flex flex-col justify-between`;
+        
+        card.innerHTML = `
+          <div class="flex items-start gap-4 mb-4">
+            <div class="text-5xl bg-white p-3 rounded-2xl shadow-sm">${decor.emoji}</div>
+            <div>
+              <h4 class="font-black text-slate-800 text-lg">${decor.name}</h4>
+              <p class="text-xs font-bold text-indigo-500 mt-1 uppercase tracking-widest">${decor.desc}</p>
+            </div>
+          </div>
+          ${isOwned ? 
+            `<button disabled class="w-full bg-slate-200 text-slate-500 font-bold py-3 rounded-xl cursor-not-allowed"><i class="fa-solid fa-check"></i> Installed</button>` : 
+            `<button onclick="buyDecor('${decor.id}', ${decor.cost})" class="btn-pastel w-full bg-slate-800 text-white font-bold py-3 rounded-xl hover:bg-slate-700">Purchase (🪙 ${decor.cost.toLocaleString()})</button>`
+          }
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function buyDecor(id, cost) {
+      if (gameState.coins < cost) {
+        showToast('Not enough coins!', true);
+        return;
+      }
+      playSound('coin');
+      gameState.coins -= cost;
+      gameState.decorations.push(id);
+      saveGame();
+      renderDecor();
+      showToast('Store Upgrade Installed!');
+    }
+
+    function closeModal(id) {
+      playSound('click');
+      const modal = document.getElementById(id);
+      const card = modal.querySelector('div');
+      card.classList.add('scale-90', 'opacity-0');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    function exportSaveData() {
+      try {
+        const dataStr = btoa(JSON.stringify(gameState));
+        navigator.clipboard.writeText(dataStr).then(() => {
+          showToast('Save Code Copied! Save it somewhere safe.');
+        }).catch(err => {
+          prompt('Please copy this text manually to save your progress:', dataStr);
+        });
+      } catch (e) {
+        showToast('Error generating save code.', true);
+      }
+    }
+
+    function importSaveData() {
+      const code = prompt('Paste your save code here:');
+      if (code) {
+        try {
+          const parsed = JSON.parse(atob(code));
+          if (parsed && typeof parsed === 'object') {
+            gameState = { ...gameState, ...parsed };
+            saveGame();
+            loadGame();
+            showToast('Progress Loaded Successfully!');
+          }
+        } catch (e) {
+          showToast('Invalid Save Code!', true);
+        }
+      }
+    }
+
+    // Initialize
+    window.onload = () => {
+      loadGame();
+      // Ensure defaults if empty array
+      if(gameState.equippedProducts.length === 0) gameState.equippedProducts = [null, null];
+    };
+  </script>
+</body>
+</html>
