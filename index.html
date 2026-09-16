@@ -163,6 +163,7 @@
           </h1>
           <p class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-widest">Product. Price. Place. Promotion.</p>
         </div>
+        <div id="decorItemsLayer" class="flex items-center gap-1 text-xl ml-2"></div>
       </div>
 
       <!-- Live Player Stats HUD -->
@@ -202,85 +203,53 @@
   <main class="max-w-7xl mx-auto w-full p-4 flex-grow">
 
     <!-- ==========================================
-         VIEW 1: BOUTIQUE SHOP (The Core Gameplay)
+         VIEW 1: MY BOUTIQUE (SHELVES & SHOP RUSH)
          ========================================== -->
     <section id="view-shop" class="tab-view space-y-6">
-      
-      <!-- Boutique Visual Header & Decor Display -->
-      <div id="shopHeaderBanner" class="relative glass-card rounded-[2rem] p-6 md:p-10 overflow-hidden border border-slate-200 transition-all duration-500 min-h-[160px] flex items-center justify-between">
-        
-        <!-- Decor Visual Layers (Dynamically populated) -->
-        <div id="decorVisualLayer" class="absolute inset-0 pointer-events-none opacity-20 bg-cover bg-center transition-all duration-700"></div>
-        <div id="decorItemsLayer" class="absolute inset-0 pointer-events-none flex justify-around items-end pb-4 text-4xl opacity-80"></div>
-
-        <div class="relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-6">
-          <div class="text-center md:text-left">
-            <span class="text-xs font-black uppercase tracking-[0.2em] text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">Live Operation</span>
-            <h2 class="text-3xl md:text-4xl font-black text-slate-800 mt-2">The Grand Retail</h2>
-            <p class="text-sm text-slate-600 mt-1 font-medium max-w-md">Align your 4P Strategy (Product, Price, Place, Promotion) to maximize profit during the 15-second customer rush.</p>
-          </div>
-
-          <button onclick="startShopRush()" id="btnOpenBoutique" class="btn-pastel bg-slate-900 text-white font-black text-xl px-10 py-5 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-xl hover:bg-slate-800 active:scale-95 w-full md:w-auto">
-            <span class="flex items-center gap-2"><i class="fa-solid fa-door-open text-2xl"></i> OPEN SHOP</span>
-            <span class="text-xs text-slate-400 font-normal uppercase tracking-widest">15 Second Rush</span>
-          </button>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-3xl border border-slate-200">
+        <div>
+          <h2 class="text-3xl font-black text-slate-800">My Boutique</h2>
+          <p class="text-sm text-slate-600 font-medium">Configure product prices & 4P strategies, then open for business!</p>
         </div>
+        <button id="btnOpenBoutique" onclick="startShopRush()" class="btn-pastel bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black px-6 py-3.5 rounded-2xl shadow-lg flex items-center justify-center gap-2 text-base tracking-wide">
+          <i class="fa-solid fa-play"></i> Open Boutique Shift
+        </button>
       </div>
 
-      <!-- Dynamic Store Shelves -->
-      <div>
-        <div class="flex flex-col sm:flex-row items-center justify-between mb-4 gap-2">
-          <h3 class="text-2xl font-black text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-shelves"></i> Display Management
-          </h3>
-          <div class="bg-blue-50 text-blue-700 text-xs font-bold px-4 py-2 rounded-xl border border-blue-200 flex items-center gap-2">
-            <i class="fa-solid fa-circle-info"></i> Elasticity: Inelastic = Steady | Elastic = Price Sensitive
+      <!-- Live Rush Animation Floor (Active during shift) -->
+      <div id="shopRushContainer" class="hidden glass-card rounded-3xl p-4 border-2 border-emerald-400 bg-gradient-to-b from-emerald-50/50 to-white relative overflow-hidden shadow-inner">
+        <div class="flex items-center justify-between mb-3 px-2">
+          <div class="flex items-center gap-2">
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+            <span class="font-black text-xs text-emerald-700 uppercase tracking-widest">Store Open • Live Rush</span>
           </div>
-        </div>
-
-        <!-- Shelf Grid (Dynamically sized 2 to 6 slots) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="shelvesGrid">
-          <!-- Populated by renderShelves() -->
-        </div>
-      </div>
-
-      <div id="shopRushContainer" class="hidden glass-card rounded-[2rem] p-6 border-2 border-indigo-300 relative overflow-hidden shadow-2xl transition-all">
-        <!-- Rush HUD -->
-        <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
           <div class="flex items-center gap-4">
-            <div id="rushTimerBadge" class="bg-rose-500 text-white font-black text-2xl px-5 py-2 rounded-xl shadow-inner font-outfit">
-              15s
+            <div class="bg-white border border-slate-200 px-3 py-1 rounded-xl text-xs font-bold text-slate-700 shadow-sm">
+              Time Left: <span id="rushTimerBadge" class="font-black text-rose-500">15s</span>
             </div>
-            <div>
-              <h4 class="font-black text-slate-800 text-lg uppercase tracking-tight">Rush in Progress!</h4>
-              <p class="text-xs text-slate-500 font-semibold">Customers are evaluating your prices...</p>
+            <div class="bg-emerald-600 text-white px-3 py-1 rounded-xl text-xs font-bold shadow-sm">
+              Shift Gross: <span id="liveRevenue" class="font-black">🪙 0</span>
             </div>
-          </div>
-          
-          <div class="text-right hidden sm:block">
-            <div class="text-xs text-slate-500 font-bold uppercase tracking-widest">Session Revenue</div>
-            <div id="liveRevenue" class="text-2xl font-black text-emerald-500 font-outfit">🪙 0</div>
           </div>
         </div>
 
-        <!-- The Animated Shop Floor -->
-        <div id="shopperFloor" class="relative w-full h-72 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden perspective-1000">
-          <!-- Background styling -->
-          <div class="absolute inset-0 opacity-10" style="background-image: repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 8px);"></div>
-          
-          <!-- Checkout Register Area (Destination) -->
-          <div class="absolute right-0 top-0 bottom-0 w-32 bg-slate-200/50 border-l-2 border-slate-300 flex flex-col items-center justify-center z-10">
-            <div class="text-4xl bg-white p-4 rounded-full shadow-md mb-2">🛒</div>
-            <span class="text-xs font-black text-slate-600 uppercase tracking-widest">Checkout</span>
-          </div>
-
-          <!-- Avatars dynamically spawn here -->
+        <!-- Walkway Floor -->
+        <div id="shopperFloor" class="h-28 bg-slate-100/80 rounded-2xl border border-slate-200 relative overflow-hidden flex items-end">
+          <div class="absolute right-4 bottom-2 text-3xl">🏪</div>
         </div>
+      </div>
+
+      <!-- Shelves Grid -->
+      <div id="shelvesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Populated by renderShelves() -->
       </div>
     </section>
 
     <!-- ==========================================
-         VIEW 2: 4 THEMED GACHA MACHINES
+         VIEW 2: 6 THEMED GACHA MACHINES
          ========================================== -->
     <section id="view-gacha" class="tab-view hidden space-y-8">
       <div class="text-center max-w-2xl mx-auto space-y-2">
@@ -288,11 +257,11 @@
         <p class="text-sm text-slate-600 font-medium">Pull inventory from themed suppliers. Higher cost capsules yield rarer, higher-margin products (Common, Rare, SSR, <span class="ur-glow">UR</span>).</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
         <!-- 1. Pastel Dream -->
         <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-pink-400 relative group overflow-hidden">
-          <div class="absolute -right-6 -top-6 w-24 h-24 bg-pink-200 rounded-full blur-2xl opacity-50"></div>
+          <div class="absolute -right-6 -top-6 w-24 h-24 bg-pink-200 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
           <h3 class="text-xl font-black text-slate-800 mb-1">Pastel Dream</h3>
           <p class="text-xs text-slate-500 font-semibold mb-4">Skincare, Plushies & Boba</p>
           <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:-rotate-6">🦄</div>
@@ -303,7 +272,7 @@
 
         <!-- 2. Cyber Tech -->
         <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-cyan-400 relative group overflow-hidden">
-          <div class="absolute -left-6 -bottom-6 w-24 h-24 bg-cyan-200 rounded-full blur-2xl opacity-50"></div>
+          <div class="absolute -left-6 -bottom-6 w-24 h-24 bg-cyan-200 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
           <h3 class="text-xl font-black text-slate-800 mb-1">Cyber Tech</h3>
           <p class="text-xs text-slate-500 font-semibold mb-4">Hardware, RGB & Gadgets</p>
           <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-6 text-cyan-500 drop-shadow-md">🎮</div>
@@ -314,7 +283,7 @@
 
         <!-- 3. Streetwear Hype -->
         <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-orange-500 relative group overflow-hidden">
-          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-orange-200 rounded-full blur-2xl opacity-50"></div>
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-orange-200 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
           <h3 class="text-xl font-black text-slate-800 mb-1">Streetwear</h3>
           <p class="text-xs text-slate-500 font-semibold mb-4">Sneakers, Hoodies & Drip</p>
           <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:-translate-y-2 drop-shadow-lg">👟</div>
@@ -323,13 +292,35 @@
           </button>
         </div>
 
-        <!-- 4. Golden Luxury -->
+        <!-- 4. Retro Arcade -->
+        <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-indigo-500 relative group overflow-hidden">
+          <div class="absolute -left-6 -top-6 w-24 h-24 bg-indigo-200 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
+          <h3 class="text-xl font-black text-slate-800 mb-1">Retro Arcade</h3>
+          <p class="text-xs text-slate-500 font-semibold mb-4">Vinyl, Pixels & Nostalgia</p>
+          <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-6 drop-shadow-md">👾</div>
+          <button onclick="pullGacha('retro', 150)" class="btn-pastel w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg">
+            Spin (🪙 150)
+          </button>
+        </div>
+
+        <!-- 5. Eco Organic -->
+        <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-emerald-500 relative group overflow-hidden">
+          <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-200 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
+          <h3 class="text-xl font-black text-slate-800 mb-1">Eco Organic</h3>
+          <p class="text-xs text-slate-500 font-semibold mb-4">Artisanal Tea, Plants & Solar</p>
+          <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:-rotate-6 drop-shadow-md">🌿</div>
+          <button onclick="pullGacha('eco', 250)" class="btn-pastel w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg">
+            Spin (🪙 250)
+          </button>
+        </div>
+
+        <!-- 6. Golden Luxury -->
         <div class="glass-card rounded-3xl p-6 text-center border-t-4 border-amber-400 relative group overflow-hidden bg-gradient-to-b from-white to-amber-50/30">
-          <div class="absolute inset-0 bg-amber-200 opacity-20 blur-3xl rounded-full"></div>
+          <div class="absolute inset-0 bg-amber-200 opacity-20 blur-3xl rounded-full pointer-events-none"></div>
           <h3 class="text-xl font-black text-slate-800 mb-1 text-amber-600">Golden Luxury</h3>
-          <p class="text-xs text-slate-500 font-semibold mb-4">Watches, Bags & Art</p>
+          <p class="text-xs text-slate-500 font-semibold mb-4">Watches, Bags & Masterpiece Art</p>
           <div class="text-7xl mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-12 drop-shadow-xl">👑</div>
-          <button onclick="pullGacha('luxury', 500)" class="btn-pastel w-full bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 text-white font-black py-3 px-4 rounded-xl shadow-lg border border-amber-300">
+          <button onclick="pullGacha('luxury', 500)" class="btn-pastel relative z-10 w-full bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600 text-white font-black py-3 px-4 rounded-xl shadow-lg border border-amber-300">
             Premium Spin (🪙 500)
           </button>
         </div>
@@ -362,7 +353,7 @@
           <p class="text-sm text-slate-600 font-medium">Review unlocked items and market lore.</p>
         </div>
         <div class="bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow">
-          Unlocked: <span id="vaultCount">0</span> / 60
+          Unlocked: <span id="vaultCount">0</span> / 90
         </div>
       </div>
 
@@ -461,12 +452,12 @@
 
   <script>
     /* ==========================================================================
-       1. DATA MODELS: 60 Unique Products & Decor
+       1. DATA MODELS: 90 Unique Products across 6 Gacha Themes
        ========================================================================== */
     const RARITY = { C: 'Common', R: 'Rare', SSR: 'SSR', UR: 'UR' };
     const DEMAND = { INELASTIC: 'Inelastic (Iron Rod)', ELASTIC: 'Elastic (Rubber Band)' };
     
-    // Generates 15 items per theme to guarantee 60 items total.
+    // Generates 15 items per theme (6 themes = 90 items total)
     const PRODUCTS_CATALOG = [
       // --- PASTEL DREAM ---
       { id: 'p1', theme: 'pastel', name: 'Pastel Sticky Notes', rarity: RARITY.C, emoji: '📝', elasticity: DEMAND.INELASTIC, unitCost: 5, basePrice: 10, lore: 'Basic student need. Very inelastic.' },
@@ -519,6 +510,40 @@
       { id: 's14', theme: 'street', name: 'Hype Chain', rarity: RARITY.SSR, emoji: '⛓️', elasticity: DEMAND.ELASTIC, unitCost: 120, basePrice: 280, lore: 'Status symbol.' },
       { id: 's15', theme: 'street', name: 'Diamond Grill', rarity: RARITY.UR, emoji: '💎', elasticity: DEMAND.INELASTIC, unitCost: 800, basePrice: 2200, lore: 'Ultimate flex.' },
 
+      // --- RETRO ARCADE ---
+      { id: 'r1', theme: 'retro', name: '8-Bit Keychain', rarity: RARITY.C, emoji: '👾', elasticity: DEMAND.ELASTIC, unitCost: 6, basePrice: 14, lore: 'Nostalgic accessory.' },
+      { id: 'r2', theme: 'retro', name: 'Arcade Token', rarity: RARITY.C, emoji: '🪙', elasticity: DEMAND.INELASTIC, unitCost: 3, basePrice: 8, lore: 'Token of nostalgia.' },
+      { id: 'r3', theme: 'retro', name: 'Retro Pin', rarity: RARITY.C, emoji: '📌', elasticity: DEMAND.ELASTIC, unitCost: 5, basePrice: 12, lore: 'Pixel art badge.' },
+      { id: 'r4', theme: 'retro', name: 'Cassette Tape', rarity: RARITY.C, emoji: '📼', elasticity: DEMAND.ELASTIC, unitCost: 10, basePrice: 22, lore: 'Vintage audio format.' },
+      { id: 'r5', theme: 'retro', name: 'Floppy Disk', rarity: RARITY.C, emoji: '💾', elasticity: DEMAND.INELASTIC, unitCost: 4, basePrice: 10, lore: '1.44MB retro icon.' },
+      { id: 'r6', theme: 'retro', name: 'Joystick Charm', rarity: RARITY.C, emoji: '🕹️', elasticity: DEMAND.ELASTIC, unitCost: 8, basePrice: 18, lore: 'Classic gaming symbol.' },
+      { id: 'r7', theme: 'retro', name: 'Vinyl LP', rarity: RARITY.R, emoji: '📻', elasticity: DEMAND.INELASTIC, unitCost: 30, basePrice: 65, lore: 'Audiophile classic.' },
+      { id: 'r8', theme: 'retro', name: 'Handheld Brick', rarity: RARITY.R, emoji: '📟', elasticity: DEMAND.ELASTIC, unitCost: 40, basePrice: 85, lore: 'Portable 8-bit gaming.' },
+      { id: 'r9', theme: 'retro', name: 'Neon Lamp', rarity: RARITY.R, emoji: '🚨', elasticity: DEMAND.ELASTIC, unitCost: 35, basePrice: 75, lore: 'Vaporwave bedroom glow.' },
+      { id: 'r10', theme: 'retro', name: 'Boombox', rarity: RARITY.R, emoji: '📻', elasticity: DEMAND.INELASTIC, unitCost: 55, basePrice: 110, lore: 'Retro street beats.' },
+      { id: 'r11', theme: 'retro', name: 'Game Cartridge', rarity: RARITY.R, emoji: '🎴', elasticity: DEMAND.INELASTIC, unitCost: 45, basePrice: 95, lore: 'Rare game release.' },
+      { id: 'r12', theme: 'retro', name: 'CRT Monitor', rarity: RARITY.SSR, emoji: '📺', elasticity: DEMAND.ELASTIC, unitCost: 120, basePrice: 280, lore: 'Zero input lag gaming holy grail.' },
+      { id: 'r13', theme: 'retro', name: 'Arcade Cabinet', rarity: RARITY.SSR, emoji: '🎰', elasticity: DEMAND.INELASTIC, unitCost: 300, basePrice: 700, lore: 'Full-size arcade machine.' },
+      { id: 'r14', theme: 'retro', name: 'Retro Jukebox', rarity: RARITY.SSR, emoji: '🎶', elasticity: DEMAND.ELASTIC, unitCost: 250, basePrice: 580, lore: 'Classic music player.' },
+      { id: 'r15', theme: 'retro', name: 'Mint 1983 Arcade Prototype', rarity: RARITY.UR, emoji: '🕹️', elasticity: DEMAND.INELASTIC, unitCost: 750, basePrice: 2000, lore: 'Priceless gaming artifact.' },
+
+      // --- ECO ORGANIC ---
+      { id: 'e1', theme: 'eco', name: 'Bamboo Straw Set', rarity: RARITY.C, emoji: '🎋', elasticity: DEMAND.INELASTIC, unitCost: 5, basePrice: 12, lore: 'Zero-waste essential.' },
+      { id: 'e2', theme: 'eco', name: 'Seed Packet', rarity: RARITY.C, emoji: '🌱', elasticity: DEMAND.ELASTIC, unitCost: 4, basePrice: 10, lore: 'Wildflower seeds.' },
+      { id: 'e3', theme: 'eco', name: 'Beeswax Wrap', rarity: RARITY.C, emoji: '🐝', elasticity: DEMAND.INELASTIC, unitCost: 8, basePrice: 18, lore: 'Eco plastic alternative.' },
+      { id: 'e4', theme: 'eco', name: 'Organic Cotton Bag', rarity: RARITY.C, emoji: '👜', elasticity: DEMAND.ELASTIC, unitCost: 10, basePrice: 22, lore: 'Reusable tote.' },
+      { id: 'e5', theme: 'eco', name: 'Herbal Tea Bag', rarity: RARITY.C, emoji: '🍵', elasticity: DEMAND.INELASTIC, unitCost: 6, basePrice: 14, lore: 'Calming beverage.' },
+      { id: 'e6', theme: 'eco', name: 'Loofah Sponge', rarity: RARITY.C, emoji: '🧽', elasticity: DEMAND.INELASTIC, unitCost: 5, basePrice: 12, lore: 'Natural cleanser.' },
+      { id: 'e7', theme: 'eco', name: 'Artisanal Loose Tea', rarity: RARITY.R, emoji: '🍃', elasticity: DEMAND.INELASTIC, unitCost: 25, basePrice: 55, lore: 'Organic loose leaf blend.' },
+      { id: 'e8', theme: 'eco', name: 'Terrarium Kit', rarity: RARITY.R, emoji: '🪴', elasticity: DEMAND.ELASTIC, unitCost: 35, basePrice: 75, lore: 'Self-contained mini garden.' },
+      { id: 'e9', theme: 'eco', name: 'Solar Charger', rarity: RARITY.R, emoji: '☀️', elasticity: DEMAND.INELASTIC, unitCost: 45, basePrice: 95, lore: 'Off-grid renewable power.' },
+      { id: 'e10', theme: 'eco', name: 'Recycled Sunglasses', rarity: RARITY.R, emoji: '🕶️', elasticity: DEMAND.ELASTIC, unitCost: 30, basePrice: 65, lore: 'Ocean plastic eyewear.' },
+      { id: 'e11', theme: 'eco', name: 'Hydroponic Pod', rarity: RARITY.R, emoji: '💧', elasticity: DEMAND.ELASTIC, unitCost: 50, basePrice: 110, lore: 'Indoor herb growing kit.' },
+      { id: 'e12', theme: 'eco', name: 'Rare Monstera Variegata', rarity: RARITY.SSR, emoji: '🌿', elasticity: DEMAND.INELASTIC, unitCost: 160, basePrice: 420, lore: 'Botanical collector item.' },
+      { id: 'e13', theme: 'eco', name: 'Artisanal Wooden Watch', rarity: RARITY.SSR, emoji: '🪵', elasticity: DEMAND.ELASTIC, unitCost: 140, basePrice: 320, lore: 'Handcrafted sustainable timepiece.' },
+      { id: 'e14', theme: 'eco', name: 'Smart Compost Bin', rarity: RARITY.SSR, emoji: '♻️', elasticity: DEMAND.ELASTIC, unitCost: 200, basePrice: 460, lore: 'Zero-odor indoor composter.' },
+      { id: 'e15', theme: 'eco', name: '500-Year Ancient Bonsai', rarity: RARITY.UR, emoji: '🪴', elasticity: DEMAND.INELASTIC, unitCost: 700, basePrice: 1800, lore: 'Living masterpiece of nature.' },
+
       // --- GOLDEN LUXURY ---
       { id: 'l1', theme: 'luxury', name: 'Silk Tie', rarity: RARITY.C, emoji: '👔', elasticity: DEMAND.ELASTIC, unitCost: 25, basePrice: 55, lore: 'Formal wear.' },
       { id: 'l2', theme: 'luxury', name: 'Pocket Square', rarity: RARITY.C, emoji: '🔲', elasticity: DEMAND.ELASTIC, unitCost: 15, basePrice: 35, lore: 'Suit accent.' },
@@ -531,10 +556,10 @@
       { id: 'l9', theme: 'luxury', name: 'Caviar Tin', rarity: RARITY.R, emoji: '🐟', elasticity: DEMAND.ELASTIC, unitCost: 150, basePrice: 300, lore: 'Gourmet status.' },
       { id: 'l10', theme: 'luxury', name: 'Crystal Glass', rarity: RARITY.R, emoji: '🥂', elasticity: DEMAND.ELASTIC, unitCost: 70, basePrice: 150, lore: 'Fine dining.' },
       { id: 'l11', theme: 'luxury', name: 'Sunglasses', rarity: RARITY.R, emoji: '🕶️', elasticity: DEMAND.INELASTIC, unitCost: 90, basePrice: 190, lore: 'Brand loyalty.' },
-      { id: 'l12', theme: 'luxury', name: 'Designer Bag', rarity: RARITY.SSR, emoji: '👜', elasticity: DEMAND.INELASTIC, unitCost: 400, basePrice: 950, lore: 'Veblen good. Price = Value.' },
-      { id: 'l13', theme: 'luxury', name: 'Gold Watch', rarity: RARITY.SSR, emoji: '⌚', elasticity: DEMAND.ELASTIC, unitCost: 500, basePrice: 1100, lore: 'Statement piece.' },
-      { id: 'l14', theme: 'luxury', name: 'Tailored Suit', rarity: RARITY.SSR, emoji: '🕴️', elasticity: DEMAND.INELASTIC, unitCost: 600, basePrice: 1300, lore: 'Bespoke fit.' },
-      { id: 'l15', theme: 'luxury', name: 'Masterpiece Art', rarity: RARITY.UR, emoji: '🖼️', elasticity: DEMAND.INELASTIC, unitCost: 1500, basePrice: 5000, lore: 'Priceless investment.' }
+      { id: 'l12', theme: 'luxury', name: 'Designer Bag', rarity: RARITY.SSR, emoji: '👜', elasticity: DEMAND.INELASTIC, unitCost: 300, basePrice: 650, lore: 'Veblen good. High-ticket niche item.' },
+      { id: 'l13', theme: 'luxury', name: 'Gold Watch', rarity: RARITY.SSR, emoji: '⌚', elasticity: DEMAND.ELASTIC, unitCost: 400, basePrice: 850, lore: 'Statement piece with selective buyer appeal.' },
+      { id: 'l14', theme: 'luxury', name: 'Tailored Suit', rarity: RARITY.SSR, emoji: '🕴️', elasticity: DEMAND.INELASTIC, unitCost: 450, basePrice: 950, lore: 'Bespoke fit for executive buyers.' },
+      { id: 'l15', theme: 'luxury', name: 'Masterpiece Art', rarity: RARITY.UR, emoji: '🖼️', elasticity: DEMAND.INELASTIC, unitCost: 1200, basePrice: 3000, lore: 'Priceless investment. Requires VIP ultra-wealthy buyers to convert!' }
     ];
 
     const DECOR_CATALOG = [
@@ -546,8 +571,8 @@
       { id: 'd6', name: 'Gold Mannequin', type: 'vip', value: 0.20, cost: 10000, emoji: '🧍', desc: '+20% Chance for VIP Customers' }
     ];
 
-    const PLACE_COSTS = { ecommerce: 5, retail: 25, boutique: 100 };
-    const PROMO_COSTS = { organic: 0, social: 15, influencer: 60, premium: 150 };
+    const PLACE_COSTS = { extensive: 5, selective: 30, exclusive: 100 };
+    const PROMO_COSTS = { awareness: 10, persuasive: 40, discount: 25, vip_pull: 80, viral: 150 };
 
     /* ==========================================================================
        2. GLOBAL STATE & PROGRESSION
@@ -668,167 +693,17 @@
 
       // Update Visual Header
       const headerLayer = document.getElementById('decorItemsLayer');
-      headerLayer.innerHTML = '';
-      gameState.decorations.forEach(dId => {
-        const d = DECOR_CATALOG.find(x => x.id === dId);
-        const el = document.createElement('div');
-        el.className = 'animate-bounce drop-shadow-md';
-        el.innerHTML = d.emoji;
-        headerLayer.appendChild(el);
-      });
-    }
-
-    function evaluateStrategy(product, strat) {
-      let stars = 3; // Base start
-      let feedback = [];
-
-      // 1. Price vs Elasticity
-      const ratio = strat.priceRatio;
-      if (product.elasticity.includes('Elastic')) {
-          if (ratio > 1.5) { stars -= 1; feedback.push("Price too high for an elastic product."); }
-          else if (ratio <= 1.0) { stars += 1; }
-      } else {
-          if (ratio < 1.0) { stars -= 0.5; feedback.push("Leaving money on the table for inelastic goods."); }
-          else if (ratio >= 1.5 && ratio <= 2.5) { stars += 1; }
-      }
-
-      // 2. Place vs Rarity
-      if (['UR', 'SSR'].includes(product.rarity)) {
-          if (strat.place === 'ecommerce') { stars -= 1.5; feedback.push("Premium goods look cheap online. Use Boutique."); }
-          else if (strat.place === 'boutique') { stars += 1; }
-      } else {
-          if (strat.place === 'boutique') { stars -= 1; feedback.push("Boutique rent is wasted on common goods."); }
-          else if (strat.place === 'ecommerce' || strat.place === 'retail') { stars += 0.5; }
-      }
-
-      // 3. Promo vs Theme/Rarity
-      if (product.rarity === 'UR' && strat.promo !== 'premium') { stars -= 1; feedback.push("UR items require Premium campaigns."); }
-      if (product.rarity === 'UR' && strat.promo === 'premium') { stars += 1; }
-      if (strat.promo === 'organic' && ratio > 1.2) { stars -= 1; feedback.push("High prices need active promotion!"); }
-      if (product.rarity === 'Common' && strat.promo === 'premium') { stars -= 1; feedback.push("Premium promo costs too much for commons."); }
-
-      // Clamp stars between 1 and 5
-      stars = Math.max(1, Math.min(5, Math.round(stars)));
-      
-      // Multiplier effect on customer purchase chance
-      const multipliers = { 1: 0.2, 2: 0.6, 3: 1.0, 4: 1.5, 5: 2.5 };
-      
-      return { 
-        stars, 
-        multiplier: multipliers[stars], 
-        feedback: feedback[0] || "Excellent 4P Strategy Alignment!" 
-      };
-    }
-
-    /* ==========================================================================
-       4. SHOP MANAGEMENT (Slots, Pricing)
-       ========================================================================== */
-    function renderShelves() {
-      const container = document.getElementById('shelvesGrid');
-      container.innerHTML = '';
-
-      for (let i = 0; i < 6; i++) {
-        const card = document.createElement('div');
-        
-        // Locked Slot Logic
-        if (i >= gameState.maxSlots) {
-          if (i === gameState.maxSlots) { // Next purchasable
-            const cost = SLOT_UPGRADE_COSTS[i + 1];
-            card.className = 'border-2 border-dashed border-indigo-300 rounded-[2rem] p-6 flex flex-col items-center justify-center text-center bg-indigo-50/50 hover:bg-indigo-50 transition-colors cursor-pointer';
-            card.onclick = () => purchaseSlot(i + 1, cost);
-            card.innerHTML = `
-              <div class="text-4xl text-indigo-300 mb-3"><i class="fa-solid fa-plus-circle"></i></div>
-              <h4 class="font-bold text-slate-700">Expand Display</h4>
-              <p class="text-xs text-slate-500 mb-3">Add slot ${i + 1} to inventory.</p>
-              <button class="bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-md">Buy (🪙 ${cost.toLocaleString()})</button>
-            `;
-          } else { // Locked completely
-            card.className = 'border-2 border-dashed border-slate-200 rounded-[2rem] p-6 flex flex-col items-center justify-center text-center bg-slate-50 opacity-50';
-            card.innerHTML = `
-              <div class="text-3xl text-slate-300 mb-2"><i class="fa-solid fa-lock"></i></div>
-              <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Locked</p>
-            `;
+      if (headerLayer) {
+        headerLayer.innerHTML = '';
+        gameState.decorations.forEach(dId => {
+          const d = DECOR_CATALOG.find(x => x.id === dId);
+          if (d) {
+            const el = document.createElement('div');
+            el.className = 'animate-bounce drop-shadow-md';
+            el.innerHTML = d.emoji;
+            headerLayer.appendChild(el);
           }
-          container.appendChild(card);
-          continue;
-        }
-
-        // Active Slot Logic
-        card.className = 'glass-card rounded-[2rem] p-5 border border-slate-200 relative flex flex-col justify-between';
-        const prodId = gameState.equippedProducts[i];
-        
-        if (!prodId) {
-          card.innerHTML = `
-            <div class="flex-grow flex flex-col items-center justify-center text-center py-6">
-              <div class="text-4xl text-slate-200 mb-2"><i class="fa-solid fa-box-open"></i></div>
-              <p class="text-sm font-bold text-slate-500">Empty Display</p>
-              <button onclick="openEquipModal(${i})" class="mt-4 bg-slate-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow hover:bg-slate-700">Equip Product</button>
-            </div>
-          `;
-        } else {
-          const product = PRODUCTS_CATALOG.find(p => p.id === prodId);
-          let strat = gameState.activeStrategies[prodId] || { priceRatio: 1.0, place: 'ecommerce', promo: 'organic' };
-          if (!strat.place) strat.place = 'ecommerce';
-          if (!strat.promo) strat.promo = 'organic';
-          gameState.activeStrategies[prodId] = strat;
-          
-          const currentPrice = Math.round(product.basePrice * strat.priceRatio);
-          const rarityColor = product.rarity === 'UR' ? 'ur-border ur-glow' : product.rarity === 'SSR' ? 'text-amber-500 border-amber-200 bg-amber-50' : product.rarity === 'Rare' ? 'text-purple-500 border-purple-200 bg-purple-50' : 'text-blue-500 border-blue-200 bg-blue-50';
-
-          card.innerHTML = `
-            <div>
-              <div class="flex justify-between items-start mb-3">
-                <span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md border ${rarityColor}">${product.rarity}</span>
-                <button onclick="unequipSlot(${i})" class="text-slate-400 hover:text-rose-500 transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
-              </div>
-              <div class="flex items-center gap-4 mb-4">
-                <div class="text-5xl drop-shadow-md">${product.emoji}</div>
-                <div>
-                  <h4 class="font-black text-slate-800 text-lg leading-tight">${product.name}</h4>
-                  <div class="text-[10px] font-bold text-slate-500 uppercase mt-1">Cost: 🪙${product.unitCost}</div>
-                  <div class="text-[10px] font-bold ${product.elasticity.includes('Inelastic') ? 'text-indigo-500' : 'text-orange-500'} uppercase">${product.elasticity}</div>
-                </div>
-              </div>
-              
-              <!-- Strategy Controls -->
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mt-auto space-y-3">
-                
-                <!-- Price -->
-                <div>
-                  <div class="flex justify-between font-black text-slate-800 text-sm mb-1">
-                    <span>Price (P1):</span>
-                    <span class="text-emerald-600">🪙 ${currentPrice}</span>
-                  </div>
-                  <input type="range" min="0.5" max="4.0" step="0.1" value="${strat.priceRatio}" 
-                    onchange="updateStrategy('${prodId}', 'priceRatio', parseFloat(this.value))"
-                    class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer slider-thumb text-slate-800">
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                  <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">Place (P3)</label>
-                    <select onchange="updateStrategy('${prodId}', 'place', this.value)" class="w-full bg-white border border-slate-200 rounded-lg text-[10px] sm:text-xs p-1.5 font-bold text-slate-700 outline-none shadow-sm cursor-pointer">
-                      <option value="ecommerce" ${strat.place === 'ecommerce' ? 'selected' : ''}>E-Commerce (🪙5)</option>
-                      <option value="retail" ${strat.place === 'retail' ? 'selected' : ''}>Retail Store (🪙25)</option>
-                      <option value="boutique" ${strat.place === 'boutique' ? 'selected' : ''}>Boutique (🪙100)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">Promo (P4)</label>
-                    <select onchange="updateStrategy('${prodId}', 'promo', this.value)" class="w-full bg-white border border-slate-200 rounded-lg text-[10px] sm:text-xs p-1.5 font-bold text-slate-700 outline-none shadow-sm cursor-pointer">
-                      <option value="organic" ${strat.promo === 'organic' ? 'selected' : ''}>Organic (🪙0)</option>
-                      <option value="social" ${strat.promo === 'social' ? 'selected' : ''}>Social Ads (🪙15)</option>
-                      <option value="influencer" ${strat.promo === 'influencer' ? 'selected' : ''}>Influencer (🪙60)</option>
-                      <option value="premium" ${strat.promo === 'premium' ? 'selected' : ''}>Premium (🪙150)</option>
-                    </select>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          `;
-        }
-        container.appendChild(card);
+        });
       }
     }
 
@@ -897,6 +772,220 @@
       gameState.equippedProducts[slot] = id;
       saveGame();
       renderShelves();
+    }
+
+    /* ==========================================================================
+       4. SHELVES & 4P MARKETING ENGINE
+       ========================================================================== */
+    function initStrategy(prodId) {
+      if (!gameState.activeStrategies[prodId]) {
+        gameState.activeStrategies[prodId] = {
+          priceRatio: 1.0,
+          place: 'extensive',
+          promo: 'awareness'
+        };
+      }
+      return gameState.activeStrategies[prodId];
+    }
+
+    function evaluateStrategy(product, strat) {
+      let stars = 5;
+      let feedback = "Excellent 4P Strategy Alignment!";
+      let multiplier = 1.0;
+
+      const isElastic = product.elasticity.includes('Elastic');
+      const priceRatio = strat.priceRatio || 1.0;
+
+      // Price & Demand Elasticity evaluation
+      if (isElastic && priceRatio > 1.3) {
+        stars -= 1;
+        feedback = `${product.name} is Elastic! High prices reduce volume.`;
+        multiplier *= 0.6;
+      } else if (!isElastic && priceRatio > 1.6) {
+        if (priceRatio > 2.2) {
+          stars -= 1;
+          feedback = `Overpricing even inelastic goods turns away buyers.`;
+          multiplier *= 0.75;
+        } else {
+          multiplier *= 1.15;
+        }
+      }
+
+      // Place / Distribution Strategy evaluation
+      if ((product.rarity === 'UR' || product.rarity === 'SSR') && strat.place === 'extensive') {
+        stars -= 1;
+        feedback = `Mass distribution dilutes high-rarity prestige!`;
+        multiplier *= 0.8;
+      } else if ((product.rarity === 'UR' || product.rarity === 'SSR') && strat.place === 'exclusive') {
+        multiplier *= 1.25;
+      } else if (product.rarity === 'Common' && strat.place === 'exclusive') {
+        stars -= 1;
+        feedback = `Exclusive placement for Common items wastes funds!`;
+        multiplier *= 0.85;
+      }
+
+      // Promotion Strategy evaluation
+      if (strat.promo === 'discount' && (product.rarity === 'UR' || product.rarity === 'SSR')) {
+        stars -= 1;
+        feedback = `Discounting luxury items hurts brand image!`;
+        multiplier *= 0.7;
+      } else if (strat.promo === 'discount' && isElastic) {
+        multiplier *= 1.3;
+      } else if (strat.promo === 'vip_pull' && (product.rarity === 'UR' || product.rarity === 'SSR')) {
+        multiplier *= 1.3;
+      } else if (strat.promo === 'viral') {
+        multiplier *= 1.35;
+      }
+
+      stars = Math.max(1, Math.min(5, stars));
+      return { stars, feedback, multiplier };
+    }
+
+    function renderShelves() {
+      const grid = document.getElementById('shelvesGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      for (let i = 0; i < gameState.maxSlots; i++) {
+        const prodId = gameState.equippedProducts[i];
+        const card = document.createElement('div');
+
+        if (prodId) {
+          const product = PRODUCTS_CATALOG.find(p => p.id === prodId);
+          if (!product) continue;
+          const strat = initStrategy(prodId);
+          const currentPrice = Math.round(product.basePrice * strat.priceRatio);
+          const evalRes = evaluateStrategy(product, strat);
+
+          card.className = "glass-card rounded-[2rem] p-5 border-2 border-slate-200 flex flex-col justify-between space-y-4 shadow-sm";
+          card.innerHTML = `
+            <div>
+              <!-- Header -->
+              <div class="flex items-start justify-between gap-3 mb-3">
+                <div class="flex items-center gap-3">
+                  <span class="text-4xl bg-slate-100 p-2 rounded-2xl drop-shadow-sm">${product.emoji}</span>
+                  <div>
+                    <h3 class="font-black text-slate-800 text-base leading-tight">${product.name}</h3>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded border ${
+                        product.rarity === 'UR' ? 'ur-border ur-glow bg-white' : 
+                        product.rarity === 'SSR' ? 'bg-amber-100 text-amber-700 border-amber-300' : 
+                        product.rarity === 'Rare' ? 'bg-purple-100 text-purple-700 border-purple-300' : 'bg-blue-100 text-blue-700 border-blue-300'
+                      }">${product.rarity}</span>
+                      <span class="text-[10px] font-bold text-slate-500">${product.elasticity}</span>
+                    </div>
+                  </div>
+                </div>
+                <button onclick="unequipSlot(${i})" class="text-slate-400 hover:text-rose-500 text-sm p-1" title="Unequip">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <!-- Cost & Price Overview -->
+              <div class="grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs font-bold mb-3">
+                <div>
+                  <span class="text-slate-400 block text-[10px] uppercase">Unit Cost</span>
+                  <span class="text-slate-700 font-black">🪙 ${product.unitCost}</span>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[10px] uppercase">MSRP</span>
+                  <span class="text-slate-700 font-black">🪙 ${product.basePrice}</span>
+                </div>
+              </div>
+
+              ${currentPrice > 300 ? `
+              <div class="mb-3 px-2 py-1 bg-amber-50 border border-amber-200 rounded-lg text-[10px] font-bold text-amber-800 flex items-center justify-between">
+                <span><i class="fa-solid fa-crown text-amber-500"></i> Niche Luxury Goods</span>
+                <span class="text-[9px] uppercase tracking-tight text-amber-600">VIP Demographic Focus</span>
+              </div>` : ''}
+
+              <!-- 4P Strategy Controls -->
+              <div class="space-y-3 bg-white p-3 rounded-2xl border border-slate-200">
+                
+                <!-- Price Slider -->
+                <div>
+                  <div class="flex justify-between items-center text-xs font-bold mb-1">
+                    <span class="text-slate-600">Price: <span class="font-black text-emerald-600">🪙 ${currentPrice}</span> (${Math.round(strat.priceRatio * 100)}%)</span>
+                  </div>
+                  <input type="range" min="0.5" max="2.5" step="0.1" value="${strat.priceRatio}" 
+                    oninput="updateStrategy('${product.id}', 'priceRatio', parseFloat(this.value))"
+                    class="w-full accent-emerald-500 slider-thumb cursor-pointer">
+                </div>
+
+                <!-- Place (Distribution) -->
+                <div>
+                  <label class="block text-[10px] font-black uppercase text-slate-400 mb-1">Place (Distribution)</label>
+                  <div class="grid grid-cols-3 gap-1">
+                    <button onclick="updateStrategy('${product.id}', 'place', 'extensive')" class="py-1 text-[10px] font-bold rounded-lg border ${strat.place === 'extensive' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 text-slate-600 border-slate-200'}">
+                      Extensive (🪙5)
+                    </button>
+                    <button onclick="updateStrategy('${product.id}', 'place', 'selective')" class="py-1 text-[10px] font-bold rounded-lg border ${strat.place === 'selective' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 text-slate-600 border-slate-200'}">
+                      Selective (🪙30)
+                    </button>
+                    <button onclick="updateStrategy('${product.id}', 'place', 'exclusive')" class="py-1 text-[10px] font-bold rounded-lg border ${strat.place === 'exclusive' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-50 text-slate-600 border-slate-200'}">
+                      Exclusive (🪙100)
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Promotion -->
+                <div>
+                  <label class="block text-[10px] font-black uppercase text-slate-400 mb-1">Promotion Strategy</label>
+                  <select onchange="updateStrategy('${product.id}', 'promo', this.value)" class="w-full text-xs font-bold p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-700">
+                    <option value="awareness" ${strat.promo === 'awareness' ? 'selected' : ''}>Awareness Ads (🪙10)</option>
+                    <option value="persuasive" ${strat.promo === 'persuasive' ? 'selected' : ''}>Persuasive Campaign (🪙40)</option>
+                    <option value="discount" ${strat.promo === 'discount' ? 'selected' : ''}>Flash Discount (🪙25)</option>
+                    <option value="vip_pull" ${strat.promo === 'vip_pull' ? 'selected' : ''}>VIP Targeting (🪙80)</option>
+                    <option value="viral" ${strat.promo === 'viral' ? 'selected' : ''}>Viral Influencer (🪙150)</option>
+                  </select>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="text-[11px] font-bold text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex items-center justify-between">
+              <span>Strategy Rating:</span>
+              <span class="text-amber-500 text-sm">${'★'.repeat(evalRes.stars)}${'☆'.repeat(5 - evalRes.stars)}</span>
+            </div>
+          `;
+        } else {
+          card.className = "glass-card rounded-[2rem] p-6 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center space-y-3 min-h-[320px]";
+          card.innerHTML = `
+            <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-3xl text-slate-400">
+              <i class="fa-solid fa-box-open"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-700">Shelf ${i + 1} Empty</h4>
+              <p class="text-xs text-slate-400">Stock a product from your gacha vault</p>
+            </div>
+            <button onclick="openEquipModal(${i})" class="btn-pastel bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 px-5 rounded-xl text-xs shadow-md">
+              <i class="fa-solid fa-plus"></i> Stock Shelf
+            </button>
+          `;
+        }
+        grid.appendChild(card);
+      }
+
+      // Render Expansion Card if available slots remain
+      const nextSlot = gameState.maxSlots + 1;
+      if (nextSlot <= 6) {
+        const cost = SLOT_UPGRADE_COSTS[nextSlot];
+        const expandCard = document.createElement('div');
+        expandCard.className = "glass-card rounded-[2rem] p-6 border-2 border-dashed border-emerald-300 bg-emerald-50/30 flex flex-col items-center justify-center text-center space-y-3 min-h-[320px]";
+        expandCard.innerHTML = `
+          <div class="w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center text-3xl text-emerald-600">
+            <i class="fa-solid fa-store"></i>
+          </div>
+          <div>
+            <h4 class="font-black text-slate-800">Expand Boutique</h4>
+            <p class="text-xs text-slate-500 font-semibold">Unlock Shelf Slot ${nextSlot}</p>
+          </div>
+          <button onclick="purchaseSlot(${nextSlot}, ${cost})" class="btn-pastel bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-xl text-xs shadow-md">
+            Expand (🪙 ${cost.toLocaleString()})
+          </button>
+        `;
+        grid.appendChild(expandCard);
+      }
     }
 
     /* ==========================================================================
@@ -994,8 +1083,21 @@
         // Punish high price heavily
         buyChance -= (ratio - 1) * 0.8; 
       } else {
-        // Inelastic (Staples/Luxury) - forgives price hikes
-        buyChance -= (ratio - 1) * 0.2;
+        // Inelastic (Staples/Luxury) - forgives moderate price hikes
+        buyChance -= (ratio - 1) * 0.25;
+      }
+
+      // REALISM ENGINE: Niche Luxury Demographic Factor
+      // Ultra-expensive items (setPrice > 300) cannot be sold in mass quantities to average shoppers.
+      if (setPrice > 300) {
+        if (!isVip) {
+          // Average shoppers pass on high-ticket luxury items
+          const luxuryDampener = Math.pow(300 / setPrice, 1.3);
+          buyChance *= luxuryDampener;
+        } else {
+          // VIP shoppers are actively looking for high-ticket items
+          buyChance *= 1.6;
+        }
       }
       
       // Global Hype Buff
@@ -1003,8 +1105,8 @@
       
       buyChance *= evalResult.multiplier;
       
-      // Cap probabilities
-      buyChance = Math.max(0.05, Math.min(0.95, buyChance));
+      // Cap probabilities (Minimum 2% conversion for mass market high-ticket, max 95%)
+      buyChance = Math.max(0.02, Math.min(0.95, buyChance));
       
       const willBuy = Math.random() < buyChance;
       let currentX = -50;
@@ -1170,23 +1272,30 @@
       // 1. Filter pool by theme
       const pool = PRODUCTS_CATALOG.filter(p => p.theme === theme);
       
-      // 2. Determine Rarity (Probability scales slightly with cost)
+      // 2. Determine Rarity (Realistic gacha probability tiers)
       let roll = Math.random();
       let targetRarity = RARITY.C;
       
-      if (cost >= 500) { // Luxury bias
-        if (roll < 0.3) targetRarity = RARITY.R;
-        else if (roll < 0.7) targetRarity = RARITY.SSR;
-        else targetRarity = RARITY.UR;
-      } else {
-        if (roll < 0.5) targetRarity = RARITY.C;
-        else if (roll < 0.8) targetRarity = RARITY.R;
-        else if (roll < 0.98) targetRarity = RARITY.SSR;
-        else targetRarity = RARITY.UR;
+      if (cost >= 500) { // Luxury tier machine
+        if (roll < 0.40) targetRarity = RARITY.C;       // 40% Common
+        else if (roll < 0.82) targetRarity = RARITY.R;  // 42% Rare
+        else if (roll < 0.97) targetRarity = RARITY.SSR; // 15% SSR
+        else targetRarity = RARITY.UR;                  // 3% UR
+      } else if (cost >= 250) { // Eco / Streetwear / Cyber
+        if (roll < 0.50) targetRarity = RARITY.C;       // 50% Common
+        else if (roll < 0.85) targetRarity = RARITY.R;  // 35% Rare
+        else if (roll < 0.98) targetRarity = RARITY.SSR; // 13% SSR
+        else targetRarity = RARITY.UR;                  // 2% UR
+      } else { // Pastel / Retro
+        if (roll < 0.60) targetRarity = RARITY.C;       // 60% Common
+        else if (roll < 0.90) targetRarity = RARITY.R;  // 30% Rare
+        else if (roll < 0.99) targetRarity = RARITY.SSR; // 9% SSR
+        else targetRarity = RARITY.UR;                  // 1% UR
       }
 
-      // 3. Select Item
-      const rarityPool = pool.filter(p => p.rarity === targetRarity);
+      // 3. Select Item with safety fallback
+      let rarityPool = pool.filter(p => p.rarity === targetRarity);
+      if (rarityPool.length === 0) rarityPool = pool;
       const pulledItem = rarityPool[Math.floor(Math.random() * rarityPool.length)];
 
       // 4. Save Unlock
